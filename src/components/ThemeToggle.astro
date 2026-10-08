@@ -1,0 +1,21 @@
+<button type="button" class="theme-toggle" aria-label="어두운 테마로 전환"><span aria-hidden="true">◐</span></button>
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  const media = matchMedia('(prefers-color-scheme: dark)');
+  const updateLabel = () => button?.setAttribute('aria-label', document.documentElement.dataset.theme === 'dark' ? '밝은 테마로 전환' : '어두운 테마로 전환');
+  updateLabel();
+  button?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch { /* Theme still works when storage is disabled. */ }
+    updateLabel();
+  });
+  media.addEventListener('change', (event) => {
+    let saved: string | null = null;
+    try { saved = localStorage.getItem('theme'); } catch { /* Use system preference. */ }
+    if (saved !== 'light' && saved !== 'dark') {
+      document.documentElement.dataset.theme = event.matches ? 'dark' : 'light';
+      updateLabel();
+    }
+  });
+</script>

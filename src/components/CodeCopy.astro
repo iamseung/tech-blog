@@ -1,0 +1,27 @@
+<p class="copy-status" role="status" aria-live="polite"></p>
+<script>
+  document.querySelectorAll<HTMLElement>('.post-body pre').forEach((pre) => {
+    const code = pre.querySelector('code');
+    if (!code) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.before(wrapper);
+    wrapper.append(pre);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'code-copy';
+    button.textContent = '복사';
+    button.setAttribute('aria-label', '코드 복사');
+    wrapper.prepend(button);
+    button.addEventListener('click', async () => {
+      const status = document.querySelector('.copy-status');
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? '');
+        if (status) status.textContent = '코드를 복사했습니다.';
+        button.textContent = '복사됨';
+      } catch {
+        if (status) status.textContent = '복사하지 못했습니다. 코드를 선택해 직접 복사해 주세요.';
+      }
+    });
+  });
+</script>

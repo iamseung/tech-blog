@@ -1,0 +1,12 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { siteConfig } from '../config/site';
+import { withBase } from '../lib/urls';
+---
+<header class="site-header">
+  <a class="wordmark" href={withBase('/')}><span class="wordmark-dot" aria-hidden="true"></span>{siteConfig.title}</a>
+  <nav aria-label="주요 메뉴">
+    <a href={withBase('/')}>글</a><a href={withBase('/tags/')}>태그</a><a href={withBase('/search/')}>검색</a>
+    <ThemeToggle />
+  </nav>
+</header>

@@ -1,0 +1,25 @@
+---
+import Header from '../components/Header.astro';
+import { siteConfig } from '../config/site';
+import '../styles/global.css';
+interface Props { title?: string; description?: string; }
+const { title = siteConfig.title, description = siteConfig.description } = Astro.props;
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} /><title>{title === siteConfig.title ? title : `${title} · ${siteConfig.title}`}</title>
+    <script is:inline>
+      let theme;
+      try { theme = localStorage.getItem('theme'); } catch {}
+      document.documentElement.dataset.theme = theme === 'dark' || theme === 'light' ? theme : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <Header />
+    <main id="main"><slot /></main>
+    <footer class="site-footer"><span>{siteConfig.title}</span><span>차분히 읽고, 오래 남기는 기록.</span></footer>
+  </body>
+</html>

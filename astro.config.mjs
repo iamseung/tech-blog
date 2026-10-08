@@ -8,8 +8,9 @@ const mode = modeIndex === -1 ? process.argv.find((argument) => argument.startsW
 if (mode === 'demo' && process.argv[2] !== 'dev') throw new Error('예시 모드는 개발 서버에서만 사용할 수 있습니다.');
 
 export default defineConfig({
+    devToolbar: { enabled: false },
     output: 'static',
     outDir: mode === 'test' ? './dist-test' : './dist',
     cacheDir: mode === 'test' ? './.astro-test' : mode === 'demo' ? './.astro-demo' : './.astro',
-    markdown: { processor: unified({ remarkPlugins: [remarkMarkdownPolicy] }), syntaxHighlight: 'shiki' },
+    markdown: { processor: unified({ remarkPlugins: [remarkMarkdownPolicy] }), syntaxHighlight: 'shiki', shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } } },
 });
