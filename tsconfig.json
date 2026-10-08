@@ -1,0 +1,6 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist", "dist-test", "node_modules"],
+  "compilerOptions": { "noUnusedLocals": true, "noUnusedParameters": true }
+}
