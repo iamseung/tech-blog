@@ -49,7 +49,9 @@ describe('Markdown 공개 정책', () => {
   it('html_in_code_is_allowed', () => { expect(() => validateMarkdown('```html\n<div>예시</div>\n```')).not.toThrow(); });
   it('standard_markdown_is_allowed', () => { expect(() => validateMarkdown('# 예시\n\n[공개 문서](https://example.com)')).not.toThrow(); });
   it('wikilink_with_inline_formatting_fails', () => { expect(() => validateMarkdown('[[**비공개 노트**]]')).toThrow(); });
-  it('wikilink_in_image_alt_fails', () => { expect(() => validateMarkdown('![[[비공개 노트]]](/images/example.png)')).toThrow(); });
+  it('wikilink_in_image_alt_fails', () => {
+    expect(() => validateMarkdown('![[[비공개 노트]]](/images/posts/example-post/image.png)', 'example-post')).toThrow(/비공개 위키링크/);
+  });
   it('body_images_are_scoped_to_the_post', () => {
     expect(() => validateMarkdown('![예시](/images/posts/example-post/image.png)', 'example-post')).not.toThrow();
     expect(() => validateMarkdown('![예시](/images/posts/other-post/image.png)', 'example-post')).toThrow();
@@ -59,5 +61,11 @@ describe('Markdown 공개 정책', () => {
   it('reference_images_are_scoped_to_the_post', () => {
     expect(() => validateMarkdown('![예시][img]\n\n[img]: /images/posts/other-post/image.png', 'example-post')).toThrow();
     expect(() => validateMarkdown('![예시][img]\n\n[img]: /images/posts/example-post/image.png', 'example-post')).not.toThrow();
+  });
+  it('first_reference_definition_controls_image_policy', () => {
+    expect(() => validateMarkdown('![예시][img]\n\n[img]: https://example.com/private.png\n[img]: /images/posts/example-post/image.png', 'example-post')).toThrow(/본문 이미지/);
+  });
+  it.each(['> [img]: /images/posts/example-post/image.png', '- [img]: /images/posts/example-post/image.png'])('nested_valid_reference_definition_is_allowed: %s', (definition) => {
+    expect(() => validateMarkdown(`![예시][img]\n\n${definition}`, 'example-post')).not.toThrow();
   });
 });

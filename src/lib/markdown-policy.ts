@@ -10,7 +10,14 @@ export function validateMarkdown(source: string, slug?: string): void {
 
 export function validateMarkdownTree(tree: Root, slug?: string): void {
   type PolicyNode = { type: string; value?: string; alt?: string | null; title?: string | null; url?: string; identifier?: string; children?: PolicyNode[] };
-  const definitions = new Map(tree.children.filter((node) => node.type === 'definition').map((node) => [node.identifier, node.url]));
+  const definitions = new Map<string, string>();
+  function collectDefinitions(node: PolicyNode): void {
+    if (node.type === 'definition' && node.identifier && node.url && !definitions.has(node.identifier)) {
+      definitions.set(node.identifier, node.url);
+    }
+    for (const child of node.children ?? []) collectDefinitions(child);
+  }
+  collectDefinitions(tree);
   function walk(node: PolicyNode): string {
     if (node.type === 'code' || node.type === 'inlineCode') return '\0';
     if (node.type === 'html') throw new Error('공개 글에 원시 HTML을 사용할 수 없습니다.');
