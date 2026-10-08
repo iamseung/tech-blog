@@ -1,6 +1,6 @@
 /** Apply the Astro base once, preserving already encoded paths. */
-export function withBase(path: string): string {
-  const base = `/${import.meta.env.BASE_URL.split('/').filter(Boolean).join('/')}`;
+export function withBase(path: string, baseUrl = import.meta.env.BASE_URL): string {
+  const base = `/${baseUrl.split('/').filter(Boolean).join('/')}`;
   const prefix = base === '/' ? '' : base;
   const normalized = `/${path.replace(/^\/+/, '')}`;
   const result = prefix && (normalized === prefix || normalized.startsWith(`${prefix}/`)) ? normalized : `${prefix}${normalized}`;

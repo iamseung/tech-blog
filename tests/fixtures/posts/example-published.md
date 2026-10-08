@@ -23,3 +23,7 @@ console.log(message);
 ## 공개 글의 링크
 
 [Astro 공식 문서](https://docs.astro.build/)처럼 공개 자료를 연결합니다.
+
+![검증용 배치 도식](/images/posts/example-markdown/layout.svg)
+
+[본문 내부 링크 예시](/posts/example-markdown/#코드-예시)
