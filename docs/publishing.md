@@ -24,7 +24,7 @@
 
 ## 저장소 연결 후 설정
 
-2026-10-09 공개 저장소 [iamseung/tech-blog](https://github.com/iamseung/tech-blog)를 연결하고 GitHub Pages에 첫 배포를 완료했습니다. 공개 주소는 https://iamseung.github.io/tech-blog/ 이며 HTTPS가 적용됩니다. 작성자 소개와 첫 글은 아직 정하지 않았습니다.
+2026-10-09 비공개 저장소 [iamseung/tech-blog](https://github.com/iamseung/tech-blog)를 연결하고 GitHub Pages에 첫 배포를 완료했습니다. 소스 저장소는 비공개이고 웹사이트는 공개입니다. 공개 주소는 https://iamseung.github.io/tech-blog/ 이며 HTTPS가 적용됩니다. 작성자 소개와 첫 글은 아직 정하지 않았습니다.
 
 GitHub Settings → Pages의 Source는 **GitHub Actions**입니다. 저장소 Actions variables에 `SITE_URL=https://iamseung.github.io`, `BASE_PATH=/tech-blog/`가 설정돼 있습니다. 다른 저장소나 도메인으로 옮길 때는 다음 규칙으로 변경하세요.
 
