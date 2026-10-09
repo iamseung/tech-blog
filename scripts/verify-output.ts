@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { resolve, relative, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, type DefaultTreeAdapterMap } from 'parse5';
+import { publishEnv } from './publish-env.mjs';
 
 type Node = DefaultTreeAdapterMap['node'];
 async function filesUnder(dir: string): Promise<string[]> {
@@ -12,12 +13,12 @@ function walk(node: Node, callback: (node: DefaultTreeAdapterMap['element']) => 
   if ('tagName' in node) callback(node);
   if ('childNodes' in node) for (const child of node.childNodes) walk(child, callback);
 }
-export async function verifyOutput(distDir: string, base: string): Promise<void> {
+export async function verifyOutput(distDir: string, base: string, site = process.env.SITE_URL ?? 'https://example.com'): Promise<void> {
   const root = resolve(distDir);
   const files = await filesUnder(root);
   const available = new Set(files);
   const prefix = `/${base.split('/').filter(Boolean).join('/')}`;
-  const origin = new URL(process.env.SITE_URL ?? 'https://example.com').origin;
+  const origin = new URL(site).origin;
   const errors: string[] = [];
   const publicArticleAssets = new Set<string>();
   const manifest = join(root, 'public-assets.json');
@@ -72,7 +73,8 @@ export async function verifyOutput(distDir: string, base: string): Promise<void>
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const dir = process.argv[2] ?? 'dist';
+  const environment = publishEnv();
   await stat(dir);
-  await verifyOutput(dir, process.env.BASE_PATH ?? '/');
+  await verifyOutput(dir, environment.BASE_PATH ?? '/', environment.SITE_URL);
   console.log(`발행 산출물 검증 완료: ${dir}`);
 }

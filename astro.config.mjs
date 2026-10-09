@@ -2,18 +2,18 @@ import { defineConfig } from 'astro/config';
 import { unified } from '@astrojs/markdown-remark';
 import { remarkMarkdownPolicy } from './src/lib/markdown-policy.ts';
 import { remarkBaseUrls } from './src/lib/markdown-urls.ts';
-import { existsSync } from 'node:fs';
+import { publishEnv } from './scripts/publish-env.mjs';
 
-if (existsSync('.env')) process.loadEnvFile('.env');
+const environment = publishEnv();
 
 // Astro consumes a config object (not Vite's config callback). Read the explicit CLI mode.
 const modeIndex = process.argv.indexOf('--mode');
 const mode = modeIndex === -1 ? process.argv.find((argument) => argument.startsWith('--mode='))?.slice(7) : process.argv[modeIndex + 1];
-const base = process.env.BASE_PATH ?? '/';
+const base = environment.BASE_PATH ?? '/';
 if (base !== '/' && !/^\/[a-zA-Z0-9_-]+\/$/.test(base)) throw new Error('BASE_PATH는 / 또는 /repo-name/ 형식이어야 합니다.');
 if (mode === 'demo' && process.argv[2] !== 'dev') throw new Error('예시 모드는 개발 서버에서만 사용할 수 있습니다.');
 const building = process.argv[2] === 'build';
-const site = process.env.SITE_URL || (building ? '' : 'http://localhost:4321');
+const site = environment.SITE_URL || (building ? '' : 'http://localhost:4321');
 let origin;
 try { origin = new URL(site); } catch { throw new Error('SITE_URL에 protocol과 host를 포함한 공개 origin을 설정하세요.'); }
 if (!['http:', 'https:'].includes(origin.protocol) || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash ||

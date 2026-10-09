@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import assert from 'node:assert/strict';
 import { verifyOutput } from './verify-output.ts';
+import { publishEnv } from './publish-env.mjs';
 
 const output = 'dist-test';
 async function inspect(dir: string): Promise<void> {
@@ -25,6 +26,7 @@ try {
   await cp(output, temporary, { recursive: true });
   await mkdir(join(temporary, 'images', 'posts'), { recursive: true });
   await writeFile(join(temporary, 'images', 'posts', 'draft-only.svg'), '<svg xmlns="http://www.w3.org/2000/svg"/>');
-  await assert.rejects(verifyOutput(temporary, process.env.BASE_PATH ?? '/'), /참조하지 않는 이미지: images\/posts\/draft-only.svg/);
+  const environment = publishEnv();
+  await assert.rejects(verifyOutput(temporary, environment.BASE_PATH ?? '/', environment.SITE_URL), /참조하지 않는 이미지: images\/posts\/draft-only.svg/);
   console.log('실제 fixture 산출물: 초안 전용 이미지 발행 차단 검증 완료');
 } finally { await rm(temporary, { recursive: true, force: true }); }

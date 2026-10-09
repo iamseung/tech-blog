@@ -1,5 +1,17 @@
 import { expect, test } from '@playwright/test';
 
+test('Unicode and space filenames load as cover and body images at root', async ({ page, request }) => {
+  await page.goto('/posts/example-markdown/');
+  const src = '/images/posts/example-markdown/%ED%95%9C%EA%B8%80%20diagram.svg';
+  for (const name of ['한글 파일명 표지 도식', '한글 파일명 본문 도식']) {
+    const image = page.getByRole('img', { name, exact: true });
+    await expect(image).toHaveAttribute('src', src);
+    await expect(image).toBeVisible();
+    expect(await image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  }
+  expect((await request.get(src)).ok()).toBe(true);
+});
+
 for (const width of [390, 1440]) {
   test(`post remains readable at ${width}px`, async ({ page, context }) => {
     await page.setViewportSize({ width, height: 1000 });

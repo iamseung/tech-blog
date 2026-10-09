@@ -11,7 +11,14 @@ const calendarDate = z.string().refine((value) => {
 export function isPostImagePath(src: string, slug: string): boolean {
   const prefix = `/images/posts/${slug}/`;
   if (!src.startsWith(prefix)) return false;
-  return src.slice(prefix.length).split('/').every((segment) => /^[a-zA-Z0-9_-][a-zA-Z0-9_.-]*$/.test(segment) && segment !== '.' && segment !== '..');
+  return src.slice(prefix.length).split('/').every((segment) => {
+    try {
+      // Decode each segment independently so escaped separators cannot create new directories.
+      const decoded = decodeURIComponent(segment);
+      return decoded.length > 0 && decoded !== '.' && decoded !== '..' &&
+        !/[\/\\%?#\u0000-\u001f\u007f]/.test(decoded);
+    } catch { return false; }
+  });
 }
 
 export const postSchema = z.object({

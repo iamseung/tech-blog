@@ -27,6 +27,12 @@ describe('공개 글 계약', () => {
   it('series_identifier_is_kebab_case', () => { expect(postSchema.safeParse(post({ series: 'Bad Series', seriesOrder: 1 })).success).toBe(false); });
   it('order_requires_series', () => { expect(postSchema.safeParse(post({ seriesOrder: 1 })).success).toBe(false); });
   it('cover_and_series_may_be_omitted', () => { expect(postSchema.safeParse(post()).success).toBe(true); });
+  it.each(['한글 diagram.svg', '%ED%95%9C%EA%B8%80%20diagram.svg'])('accepts Unicode and space cover filenames: %s', (name) => {
+    expect(postSchema.safeParse(post({ cover: { src: `/images/posts/example-post/${name}`, alt: '도식' } })).success).toBe(true);
+  });
+  it.each(['%2e%2e/secret.svg', '%2E/secret.svg', 'nested%2fsecret.svg', 'nested%5csecret.svg', '%252e%252e/secret.svg', 'bad%zz.svg', 'file.svg?query', 'file.svg#fragment', 'nested\\secret.svg'])('rejects unsafe encoded cover paths: %s', (name) => {
+    expect(postSchema.safeParse(post({ cover: { src: `/images/posts/example-post/${name}`, alt: '도식' } })).success).toBe(false);
+  });
   it('draft_is_required_boolean', () => {
     const { draft: _draft, ...withoutDraft } = post();
     expect(postSchema.safeParse(withoutDraft).success).toBe(false);
@@ -43,6 +49,13 @@ describe('공개 글 계약', () => {
 });
 
 describe('Markdown 공개 정책', () => {
+  it.each(['한글 diagram.svg', '%ED%95%9C%EA%B8%80%20diagram.svg'])('accepts Unicode and space body images: %s', (name) => {
+    expect(() => validateMarkdown(`![도식](</images/posts/example-post/${name}>)`, 'example-post')).not.toThrow();
+    expect(() => validateMarkdown(`![도식][image]\n\n[image]: </images/posts/example-post/${name}>`, 'example-post')).not.toThrow();
+  });
+  it.each(['%2e%2e/secret.svg', 'nested%2fsecret.svg', 'nested%5csecret.svg', '%252e%252e/secret.svg'])('rejects encoded traversal and separators in body images: %s', (name) => {
+    expect(() => validateMarkdown(`![도식](/images/posts/example-post/${name})`, 'example-post')).toThrow(/본문 이미지/);
+  });
   it('wikilink_in_prose_fails', () => { expect(() => validateMarkdown('문장 안 [[비공개 노트|별칭]]')).toThrow(); });
   it('wikilink_in_code_is_allowed', () => { expect(() => validateMarkdown('`[[예시]]`\n\n```md\n[[예시]]\n```')).not.toThrow(); });
   it('raw_html_fails', () => { expect(() => validateMarkdown('<script>alert(1)</script>')).toThrow(); });

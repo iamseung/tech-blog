@@ -7,6 +7,9 @@ tags: [예시, Markdown]
 series: example-writing
 seriesOrder: 1
 draft: false
+cover:
+  src: '/images/posts/example-markdown/한글 diagram.svg'
+  alt: '한글 파일명 표지 도식'
 ---
 
 # 예시 콘텐츠
@@ -25,5 +28,7 @@ console.log(message);
 [Astro 공식 문서](https://docs.astro.build/)처럼 공개 자료를 연결합니다.
 
 ![검증용 배치 도식](/images/posts/example-markdown/layout.svg)
+
+![한글 파일명 본문 도식](</images/posts/example-markdown/한글 diagram.svg>)
 
 [본문 내부 링크 예시](/posts/example-markdown/#코드-예시)

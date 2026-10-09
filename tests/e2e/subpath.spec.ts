@@ -1,4 +1,15 @@
 import { expect, test } from '@playwright/test';
+test('Unicode and space filenames load as cover and body images under deployment base', async ({ page, request }) => {
+  await page.goto('/tech-blog/posts/example-markdown/');
+  const src = '/tech-blog/images/posts/example-markdown/%ED%95%9C%EA%B8%80%20diagram.svg';
+  for (const name of ['한글 파일명 표지 도식', '한글 파일명 본문 도식']) {
+    const image = page.getByRole('img', { name, exact: true });
+    await expect(image).toHaveAttribute('src', src);
+    await expect(image).toBeVisible();
+    expect(await image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  }
+  expect((await request.get(src)).ok()).toBe(true);
+});
 test('search and publishing metadata retain deployment base', async ({ page, request }) => {
   await page.goto('/tech-blog/search/');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://example.com/tech-blog/search/');

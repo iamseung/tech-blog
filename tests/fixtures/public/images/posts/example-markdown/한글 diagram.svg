@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="180" viewBox="0 0 640 180" role="img" aria-label="한글 파일명 검증 도식">
+  <rect width="640" height="180" rx="12" fill="#e8f4ef"/>
+  <path d="M120 90H520" stroke="#247457" stroke-width="6"/>
+  <circle cx="120" cy="90" r="30" fill="#247457"/>
+  <circle cx="520" cy="90" r="30" fill="#247457"/>
+</svg>
