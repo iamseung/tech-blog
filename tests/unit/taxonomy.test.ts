@@ -1,7 +1,12 @@
 import { expect, it } from 'vitest';
-import { groupByTag, groupBySeries, relatedPosts, featuredPosts, type PublishedPost } from '../../src/lib/taxonomy';
+import { groupByTag, groupBySeries, relatedPosts, featuredPosts, tagSegment, type PublishedPost } from '../../src/lib/taxonomy';
 import { selectPublished } from '../../src/lib/posts';
 const post = (slug: string, tags = ['예시'], publishedAt = '2026-10-08', extra = {}): PublishedPost => ({ id: slug, body: '', collection: 'posts', data: { slug, title: slug, description: '예시', tags, publishedAt, draft: false, ...extra } });
+it('slash escaping retains normalized Korean and distinguishes literal escape names', () => {
+  expect(tagSegment('C/C++')).toBe('C~2FC++');
+  expect(tagSegment('C~2FC++')).toBe('C~7E2FC++');
+  expect(tagSegment('한글'.normalize('NFD'))).toBe('한글');
+});
 it('empty collections have no groups, related or featured posts', () => {
   expect(groupByTag([]).size).toBe(0); expect(groupBySeries([]).size).toBe(0);
   expect(featuredPosts([], ['missing'])).toEqual([]); expect(relatedPosts(post('a'), [])).toEqual([]);

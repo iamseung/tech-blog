@@ -1,4 +1,13 @@
 import { expect, test } from '@playwright/test';
+test('reserved characters in tag names retain a single route segment', async ({ page }) => {
+  await page.goto('/tags/');
+  await page.getByRole('link', { name: 'C/C++ 1', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '#C/C++', exact: true })).toBeVisible();
+  await expect(page.locator('.post-card')).toHaveCount(1);
+  await page.getByRole('heading', { name: '예시: 기록을 연결하는 방법', exact: true }).getByRole('link').click();
+  await page.locator('.post-tags').getByRole('link', { name: 'C/C++', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '#C/C++', exact: true })).toBeVisible();
+});
 test('home cards, Korean tags, ordered series and related articles connect', async ({ page, request }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: '지식과 문제 해결의 기록' })).toBeVisible();

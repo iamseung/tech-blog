@@ -1,5 +1,8 @@
 import type { getPublishedPosts } from './posts';
 export type PublishedPost = Awaited<ReturnType<typeof getPublishedPosts>>[number];
+// Encoded slashes cannot be served as filesystem paths. Escape literal ~ first
+// so distinct tag names cannot collide with the slash escape.
+export const tagSegment = (tag: string): string => tag.normalize('NFC').replaceAll('~', '~7E').replaceAll('/', '~2F');
 export const normalizedTags = (post: PublishedPost): string[] => [...new Set(post.data.tags.map(tag => tag.normalize('NFC')))];
 export function groupByTag(posts: PublishedPost[]): Map<string, PublishedPost[]> {
   const groups = new Map<string, PublishedPost[]>();

@@ -3,7 +3,7 @@ title: '예시: 기록을 연결하는 방법'
 description: '태그와 관련 글로 기록을 찾아가는 탐색 화면 검증용 예시입니다. 실제 발행 글이 아닙니다.'
 slug: example-connections
 publishedAt: '2026-10-10'
-tags: [예시, 글쓰기]
+tags: [예시, 글쓰기, 'C/C++']
 draft: false
 ---
 

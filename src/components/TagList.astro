@@ -1,6 +1,7 @@
 ---
 import { withBase } from '../lib/urls';
+import { tagSegment } from '../lib/taxonomy';
 interface Props { tags: string[]; }
 const tags = [...new Set(Astro.props.tags.map(tag => tag.normalize('NFC')))];
 ---
-<div class="tag-list">{tags.map(tag => <a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>)}</div>
+<div class="tag-list">{tags.map(tag => <a href={withBase(`/tags/${encodeURIComponent(tagSegment(tag))}/`)}>{tag}</a>)}</div>
