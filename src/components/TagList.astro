@@ -1,0 +1,6 @@
+---
+import { withBase } from '../lib/urls';
+interface Props { tags: string[]; }
+const tags = [...new Set(Astro.props.tags.map(tag => tag.normalize('NFC')))];
+---
+<div class="tag-list">{tags.map(tag => <a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>)}</div>

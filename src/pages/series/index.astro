@@ -1,0 +1,8 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../../lib/posts';
+import { groupBySeries } from '../../lib/taxonomy';
+import { withBase } from '../../lib/urls';
+const groups = [...groupBySeries(await getPublishedPosts())];
+---
+<BaseLayout title="시리즈"><div class="discovery-shell compact-page"><header class="page-intro"><p class="eyebrow">이어 읽는 기록</p><h1>시리즈</h1><p>하나의 주제를 순서대로 읽어보세요.</p></header><div class="series-list">{groups.map(([series, posts]) => <a href={withBase(`/series/${series}/`)}><span class="eyebrow">{posts.length}개의 글</span><h2>{series}</h2><p>{posts[0].data.title}</p><span class="series-arrow" aria-hidden="true">→</span></a>)}</div>{!groups.length && <p class="empty-message">첫 시리즈를 준비하고 있습니다.</p>}</div></BaseLayout>

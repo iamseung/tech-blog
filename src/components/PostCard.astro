@@ -1,0 +1,17 @@
+---
+import type { PublishedPost } from '../lib/taxonomy';
+import { postUrl, withBase } from '../lib/urls';
+import TagList from './TagList.astro';
+interface Props { post: PublishedPost; order?: number; }
+const { post, order } = Astro.props;
+const { data } = post;
+---
+<article class:list={['post-card', { 'has-cover': !!data.cover }]}>
+  <div class="card-copy">
+    <div class="card-meta">{order && <span class="series-order">{String(order).padStart(2, '0')}</span>}<time datetime={data.publishedAt}>{data.publishedAt.replaceAll('-', '. ')}</time>{data.series && <a href={withBase(`/series/${data.series}/`)}>시리즈 ↗</a>}</div>
+    <h2><a href={postUrl(data.slug)}>{data.title}</a></h2>
+    <p>{data.description}</p>
+    <TagList tags={data.tags} />
+  </div>
+  {data.cover && <a class="card-cover" href={postUrl(data.slug)} tabindex="-1" aria-hidden="true"><img src={withBase(data.cover.src)} alt="" loading="lazy" /></a>}
+</article>

@@ -5,11 +5,16 @@ import BaseLayout from './BaseLayout.astro';
 import CodeCopy from '../components/CodeCopy.astro';
 import { withBase } from '../lib/urls';
 import { siteConfig } from '../config/site';
+import { getPublishedPosts } from '../lib/posts';
+import { relatedPosts } from '../lib/taxonomy';
+import PostCard from '../components/PostCard.astro';
+import TagList from '../components/TagList.astro';
 interface Props { post: CollectionEntry<'posts'>; headings: MarkdownHeading[]; }
 const { post, headings } = Astro.props;
 const { data } = post;
 const minutes = Math.max(1, Math.ceil((post.body ?? '').replace(/\s/g, '').length / 500));
 const toc = headings.filter(({ depth }) => depth <= 3);
+const related = relatedPosts(post, await getPublishedPosts());
 ---
 <BaseLayout title={data.title} description={data.description}>
   <div class="post-shell">
@@ -21,13 +26,14 @@ const toc = headings.filter(({ depth }) => depth <= 3);
         <p class="post-description">{data.description}</p>
         <div class="post-meta">{siteConfig.authorName && <span>{siteConfig.authorName} · </span>}<time datetime={data.publishedAt}>{data.publishedAt.replaceAll('-', '. ')}</time><span aria-hidden="true">·</span><span>약 {minutes}분 읽기</span></div>
         {data.updatedAt && <p class="updated-at">수정 <time datetime={data.updatedAt}>{data.updatedAt}</time></p>}
-        <div class="post-tags">{data.tags.map((tag) => <a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>)}</div>
+        <div class="post-tags"><TagList tags={data.tags} /></div>
       </header>
       {data.cover && <img class="post-cover" src={withBase(data.cover.src)} alt={data.cover.alt} />}
       {toc.length > 0 && <details class="mobile-toc"><summary>이 글의 목차</summary><nav aria-label="글 목차"><ul>{toc.map((heading) => <li class:list={{ nested: heading.depth > 2 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ul></nav></details>}
       <div class="post-body"><slot /></div>
       <CodeCopy />
       <div class="post-end"><span aria-hidden="true">✦</span><a href={withBase('/')}>다른 글 둘러보기 <span aria-hidden="true">→</span></a></div>
+      {related.length > 0 && <section class="related-posts"><h2 class="section-heading">함께 읽기</h2>{related.map(post => <PostCard post={post} />)}</section>}
     </article>
     {toc.length > 0 && <aside class="desktop-toc"><nav aria-label="글 목차"><p>이 글의 목차</p><ul>{toc.map((heading) => <li class:list={{ nested: heading.depth > 2 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ul></nav></aside>}
   </div>

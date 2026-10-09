@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPublishedPosts } from '../lib/posts';
+import { featuredPosts, groupByTag } from '../lib/taxonomy';
+import { siteConfig } from '../config/site';
+import { withBase } from '../lib/urls';
+const posts = await getPublishedPosts();
+const featured = featuredPosts(posts, siteConfig.featuredSlugs);
+const tags = [...groupByTag(posts)].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'ko'));
+---
+<BaseLayout>
+  <div class="discovery-shell">
+    <header class="publication-intro"><p class="eyebrow">{siteConfig.title}</p><h1>지식과 문제 해결의 기록</h1><p>{siteConfig.description}</p><a href={withBase('/about/')}>이 공간에 대해 <span aria-hidden="true">↗</span></a></header>
+    <div class="discovery-grid">
+      <section class="article-feed" aria-label="글 목록">
+        {featured.length > 0 && <section class="featured-posts"><h2 class="section-heading">대표 글</h2>{featured.map(post => <PostCard post={post} />)}</section>}
+        <div class="feed-heading"><h2 class="section-heading">최신 글</h2><span>{posts.length}개의 기록</span></div>
+        {posts.length ? posts.map(post => <PostCard post={post} />) : <div class="empty-state"><span aria-hidden="true">✦</span><h2>첫 기록을 준비하고 있습니다.</h2><p>지식과 문제 해결의 과정을 차근차근 담아갈 공간입니다.<br />새로운 글이 발행되면 이곳에서 만나보세요.</p></div>}
+      </section>
+      <aside class="discovery-sidebar"><h2>관심 있는 주제로</h2>{tags.length ? <div class="topic-list">{tags.map(([tag, entries]) => <a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}><span>{tag}</span><span>{entries.length}</span></a>)}</div> : <p>글이 쌓이면 주제별로<br />둘러볼 수 있습니다.</p>}<a class="subtle-link" href={withBase('/tags/')}>모든 태그 보기 →</a><div class="sidebar-note"><p>기록은 연결될 때<br />더 오래 남습니다.</p><a href={withBase('/series/')}>시리즈 둘러보기 →</a></div></aside>
+    </div>
+  </div>
+</BaseLayout>
