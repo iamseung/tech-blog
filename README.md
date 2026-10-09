@@ -2,6 +2,10 @@
 
 한국어 Markdown 기반 Astro 정적 블로그입니다. 공개용 글은 아직 없으며 개발 예시는 production 빌드에 포함되지 않습니다.
 
+- 블로그: https://iamseung.github.io/tech-blog/
+- 저장소: https://github.com/iamseung/tech-blog
+- `main`에 push하면 전체 검증 후 GitHub Pages에 자동 배포됩니다.
+
 ## 빠른 시작
 
 Node.js 22.23.3과 npm을 준비한 뒤 실행하세요. 의존성은 lockfile에 고정되어 있습니다.

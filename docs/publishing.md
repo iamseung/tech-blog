@@ -24,7 +24,9 @@
 
 ## 저장소 연결 후 설정
 
-현재 원격 저장소, 작성자 소개와 공개 도메인은 정해지지 않았습니다. 실제 저장소를 연결한 뒤 GitHub Settings → Pages의 Source를 **GitHub Actions**로 설정하고 저장소 Actions variables를 추가하세요.
+2026-10-09 공개 저장소 [iamseung/tech-blog](https://github.com/iamseung/tech-blog)를 연결하고 GitHub Pages에 첫 배포를 완료했습니다. 공개 주소는 https://iamseung.github.io/tech-blog/ 이며 HTTPS가 적용됩니다. 작성자 소개와 첫 글은 아직 정하지 않았습니다.
+
+GitHub Settings → Pages의 Source는 **GitHub Actions**입니다. 저장소 Actions variables에 `SITE_URL=https://iamseung.github.io`, `BASE_PATH=/tech-blog/`가 설정돼 있습니다. 다른 저장소나 도메인으로 옮길 때는 다음 규칙으로 변경하세요.
 
 - `SITE_URL`: `https://your-name.github.io` 또는 커스텀 도메인의 HTTP(S) origin. `/repo-name/`을 포함하지 않습니다.
 - `BASE_PATH`: 사용자 사이트·커스텀 도메인은 `/`, 프로젝트 사이트는 `/repo-name/`.
