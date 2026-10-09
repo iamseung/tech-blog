@@ -4,7 +4,7 @@
 
 - 블로그: https://iamseung.github.io/tech-blog/
 - 저장소: https://github.com/iamseung/tech-blog
-- 소스 저장소는 비공개이며 블로그 웹사이트만 공개됩니다.
+- 소스 저장소와 블로그 웹사이트 모두 공개됩니다.
 - `main`에 push하면 전체 검증 후 GitHub Pages에 자동 배포됩니다.
 
 ## 빠른 시작
