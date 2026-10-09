@@ -22,3 +22,19 @@ it('reports missing targets, anchors, images and draft-only public assets', asyn
   await writeFile(join(dir, 'images', 'posts', 'draft-only.svg'), '<svg/>');
   await expect(verifyOutput(dir, '/')).rejects.toThrow(/missing[\s\S]*draft-only/);
 });
+it('rejects post assets referenced only by a non-article page', async () => {
+  await fixture('<a href="/about/">소개</a>');
+  await mkdir(join(dir, 'about'), { recursive: true });
+  await writeFile(join(dir, 'about', 'index.html'), '<img src="/images/posts/draft-only.svg">');
+  await mkdir(join(dir, 'images', 'posts'), { recursive: true });
+  await writeFile(join(dir, 'images', 'posts', 'draft-only.svg'), '<svg/>');
+  await writeFile(join(dir, 'public-assets.json'), '[]');
+  await expect(verifyOutput(dir, '/')).rejects.toThrow(/참조하지 않는 이미지/);
+});
+it('allows only assets declared by public article content or cover metadata', async () => {
+  await fixture('<img src="/blog/images/posts/public.svg">');
+  await mkdir(join(dir, 'images', 'posts'), { recursive: true });
+  await writeFile(join(dir, 'images', 'posts', 'public.svg'), '<svg/>');
+  await writeFile(join(dir, 'public-assets.json'), '["/blog/images/posts/public.svg"]');
+  await expect(verifyOutput(dir, '/blog/')).resolves.toBeUndefined();
+});

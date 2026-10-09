@@ -1,5 +1,5 @@
 import { getPublishedPosts } from '../lib/posts';
-import { markdownText } from '../lib/search';
+import { markdownText } from '../lib/markdown-text';
 import { postUrl } from '../lib/urls';
 export async function GET() {
   const posts = await getPublishedPosts();

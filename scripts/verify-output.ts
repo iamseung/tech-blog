@@ -19,7 +19,21 @@ export async function verifyOutput(distDir: string, base: string): Promise<void>
   const prefix = `/${base.split('/').filter(Boolean).join('/')}`;
   const origin = new URL(process.env.SITE_URL ?? 'https://example.com').origin;
   const errors: string[] = [];
-  const referenced = new Set<string>();
+  const publicArticleAssets = new Set<string>();
+  const manifest = join(root, 'public-assets.json');
+  if (available.has(manifest)) {
+    const entries: unknown = JSON.parse(await readFile(manifest, 'utf8'));
+    if (!Array.isArray(entries) || !entries.every(value => typeof value === 'string')) throw new Error('공개 글 이미지 manifest 형식 오류');
+    for (const url of entries as string[]) {
+      const pathname = decodeURIComponent(new URL(url, origin).pathname);
+      const assetPath = prefix === '/' ? pathname : pathname.startsWith(`${prefix}/`) ? pathname.slice(prefix.length) : '';
+      if (!assetPath.startsWith('/images/posts/')) throw new Error(`공개 글 이미지 manifest 경로 오류: ${url}`);
+      const target = resolve(root, `.${assetPath}`);
+      if (!target.startsWith(`${join(root, 'images', 'posts')}${sep}`)) throw new Error(`공개 글 이미지 manifest 경로 오류: ${url}`);
+      if (!available.has(target)) errors.push(`공개 글 이미지 없음: ${url}`);
+      publicArticleAssets.add(target);
+    }
+  }
   const ids = new Map<string, Set<string>>();
   const references: { file: string; url: string }[] = [];
   for (const file of files.filter(path => path.endsWith('.html'))) {
@@ -49,12 +63,11 @@ export async function verifyOutput(distDir: string, base: string): Promise<void>
       if (path !== root && !path.startsWith(`${root}${sep}`)) throw new Error('출력 폴더 밖의 경로');
       const target = available.has(path) ? path : join(path, 'index.html');
       if (!available.has(target)) throw new Error('대상 파일 없음');
-      referenced.add(target);
       if (targetUrl.hash && ids.has(target) && !ids.get(target)!.has(decodeURIComponent(targetUrl.hash.slice(1)))) throw new Error('앵커 없음');
     } catch (error) { errors.push(`${relative(root, file)}: ${url} (${(error as Error).message})`); }
   }
   const postAssets = join(root, 'images', 'posts') + sep;
-  for (const file of files) if (file.startsWith(postAssets) && !referenced.has(file)) errors.push(`공개 글이 참조하지 않는 이미지: ${relative(root, file)}`);
+  for (const file of files) if (file.startsWith(postAssets) && !publicArticleAssets.has(file)) errors.push(`공개 글이 참조하지 않는 이미지: ${relative(root, file)}`);
   if (errors.length) throw new Error(`발행 산출물 검증 실패:\n${errors.join('\n')}`);
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
