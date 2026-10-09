@@ -1,4 +1,14 @@
 import { expect, test } from '@playwright/test';
+test('search and publishing metadata retain deployment base', async ({ page, request }) => {
+  await page.goto('/tech-blog/search/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://example.com/tech-blog/search/');
+  await page.getByLabel('검색어', { exact: true }).fill('코드 예시');
+  await expect(page.locator('#search-results a')).toHaveAttribute('href', '/tech-blog/posts/example-markdown/');
+  for (const path of ['rss.xml', 'sitemap.xml']) {
+    const text = await (await request.get(`/tech-blog/${path}`)).text();
+    expect(text).toContain('https://example.com/tech-blog/posts/example-markdown/');
+  }
+});
 test('Markdown images and internal links work beneath a deployed base', async ({ page }) => {
   await page.goto('/tech-blog/posts/example-markdown/');
   const image = page.getByRole('img', { name: '검증용 배치 도식' });

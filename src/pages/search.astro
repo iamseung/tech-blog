@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/urls';
+---
+<BaseLayout title="검색">
+  <section class="search-shell" data-search-index={withBase('/search-index.json')}>
+    <p class="eyebrow">기록 찾기</p><h1>검색</h1><p>제목, 본문, 태그에서 관심 있는 기록을 찾아보세요.</p>
+    <form role="search"><label for="query">검색어</label><div class="search-controls"><input id="query" name="q" type="search" autocomplete="off" placeholder="궁금한 단어를 입력하세요" /><button type="submit">검색</button></div></form>
+    <p id="search-status" role="status" aria-live="polite">검색어를 입력해 주세요.</p><ul id="search-results"></ul>
+    <noscript><p>검색에는 JavaScript가 필요합니다. <a href={withBase('/tags/')}>태그별 글</a>을 둘러보세요.</p></noscript>
+  </section>
+</BaseLayout>
+<script>
+  import { searchPosts, type SearchDocument } from '../lib/search';
+  const shell = document.querySelector<HTMLElement>('[data-search-index]')!;
+  const form = shell.querySelector('form')!;
+  const input = shell.querySelector<HTMLInputElement>('input')!;
+  const status = document.querySelector<HTMLElement>('#search-status')!;
+  const results = document.querySelector<HTMLUListElement>('#search-results')!;
+  let documents: Promise<SearchDocument[]> | undefined;
+  let requestId = 0;
+  async function search() {
+    const id = ++requestId;
+    const query = input.value;
+    results.replaceChildren();
+    if (!query.trim()) { status.textContent = '검색어를 입력해 주세요.'; return; }
+    status.textContent = '검색 중입니다…';
+    try {
+      documents ??= fetch(shell.dataset.searchIndex!).then(response => { if (!response.ok) throw new Error('검색 자료를 읽지 못했습니다.'); return response.json(); });
+      const matches = searchPosts(await documents, query);
+      if (id !== requestId) return;
+      status.textContent = matches.length ? `${matches.length}개의 글을 찾았습니다.` : '검색 결과가 없습니다.';
+      for (const doc of matches) {
+        const item = document.createElement('li');
+        const link = document.createElement('a'); link.href = doc.url; link.textContent = doc.title;
+        const description = document.createElement('p'); description.textContent = doc.description;
+        item.append(link, description); results.append(item);
+      }
+    } catch { if (id === requestId) { documents = undefined; status.textContent = '검색 자료를 불러오지 못했습니다. 다시 검색해 주세요.'; } }
+  }
+  form.addEventListener('submit', event => { event.preventDefault(); void search(); });
+  input.addEventListener('input', () => void search());
+  input.value = new URL(location.href).searchParams.get('q') ?? '';
+  if (input.value) void search();
+</script>
+<style>
+  .search-shell { max-width: 720px; margin: 4rem auto 7rem; padding: 0 1.5rem; }
+  h1 { font-size: 2.5rem; margin: .5rem 0 1rem; }
+  form { margin: 2.5rem 0 1.5rem; } label { display: block; margin-bottom: .75rem; }
+  .search-controls { display: flex; gap: .75rem; } input { min-width: 0; flex: 1; padding: .9rem; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: .5rem; font: inherit; }
+  button { padding: .75rem 1.25rem; font: inherit; cursor: pointer; border: 1px solid var(--line); border-radius: .5rem; background: var(--surface); color: var(--accent); }
+  ul { padding: 0; list-style: none; } ul :global(li) { padding: 1.5rem 0; border-bottom: 1px solid var(--line); } ul :global(a) { font-size: 1.3rem; font-weight: 700; } ul :global(p) { margin-bottom: 0; }
+</style>

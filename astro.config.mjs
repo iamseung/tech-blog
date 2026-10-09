@@ -10,6 +10,7 @@ const base = process.env.BASE_PATH ?? '/';
 if (mode === 'demo' && process.argv[2] !== 'dev') throw new Error('예시 모드는 개발 서버에서만 사용할 수 있습니다.');
 
 export default defineConfig({
+    site: process.env.SITE_URL ?? 'https://example.com',
     base,
     publicDir: mode === 'test' || mode === 'demo' ? './tests/fixtures/public' : './public',
     devToolbar: { enabled: false },
