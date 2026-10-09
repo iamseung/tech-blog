@@ -28,3 +28,26 @@ test('discovery links and cover retain deployment base', async ({ page }) => {
   await expect(cover).toHaveAttribute('src', '/tech-blog/images/posts/example-structure/cover.svg');
   expect(await cover.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
 });
+test('post to tag and search navigation plus slash tags work under base', async ({ page, request }) => {
+  await page.goto('/tech-blog/');
+  await page.getByRole('heading', { name: '예시: Markdown 글쓰기', exact: true }).getByRole('link').click();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://example.com/tech-blog/posts/example-markdown/');
+  await page.locator('.post-tags').getByRole('link', { name: '예시', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '#예시', exact: true })).toBeVisible();
+  await page.getByRole('navigation', { name: '주요 메뉴' }).getByRole('link', { name: '검색', exact: true }).click();
+  await page.getByLabel('검색어', { exact: true }).fill('코드 예시');
+  await page.locator('#search-results a').click();
+  await expect(page).toHaveURL(/\/tech-blog\/posts\/example-markdown\/$/);
+  await page.goto('/tech-blog/tags/');
+  await page.getByRole('link', { name: 'C/C++ 1', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '#C/C++', exact: true })).toBeVisible();
+  expect((await request.get('/tech-blog/posts/example-draft-hidden/')).status()).toBe(404);
+  expect((await request.get('/tech-blog/tags/초안검증/')).status()).toBe(404);
+  for (const path of ['search-index.json', 'rss.xml', 'sitemap.xml']) {
+    const response = await request.get(`/tech-blog/${path}`);
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+    expect(body).not.toContain('PRIVATE_DRAFT_CANARY');
+    expect(body).not.toContain('example-draft-hidden');
+  }
+});

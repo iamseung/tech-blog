@@ -16,7 +16,9 @@
     "preview": "node_modules/node/bin/node node_modules/astro/bin/astro.mjs preview",
     "check": "node_modules/node/bin/node node_modules/astro/bin/astro.mjs check",
     "test": "node_modules/node/bin/node node_modules/vitest/vitest.mjs run tests/unit",
-    "test:e2e": "node_modules/node/bin/node node_modules/playwright/cli.js test"
+    "test:e2e": "node_modules/node/bin/node node_modules/playwright/cli.js test",
+    "test:e2e:subpath": "node_modules/node/bin/node node_modules/playwright/cli.js test --config playwright.subpath.config.ts",
+    "verify": "npm run check && npm test && npm run build && npm run test:e2e && npm run test:e2e:subpath"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.2",

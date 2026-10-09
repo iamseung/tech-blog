@@ -6,6 +6,7 @@ dist-test/
 .astro-demo/
 .env
 .env.*
+!.env.example
 .DS_Store
 test-results/
 playwright-report/
