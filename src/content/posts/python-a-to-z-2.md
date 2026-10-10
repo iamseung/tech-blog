@@ -13,7 +13,9 @@ draft: false
 
 코드를 나눈다는 것은 파일 수를 늘리는 일이 아닙니다. **어떤 데이터가 들어오고, 누가 상태를 바꾸고, 실패하면 누가 책임지는지 경계를 만드는 일**입니다.
 
-[1편](/posts/python-a-to-z-1/)에서 변수와 객체를 살펴봤습니다. 이번에는 Python 3.13 기준으로 함수들을 하나의 프로그램으로 구성하는 방법을 정리합니다. 각 코드 블록은 독립 예제이며, 파일 이름을 지정한 예제만 안내된 구조로 함께 저장합니다.
+[1편](/posts/python-a-to-z-1/)에서 변수와 객체를 살펴봤습니다. 이번에는 Python 3.13 기준으로 함수들을 하나의 프로그램으로 구성하는 방법을 정리합니다.
+
+각 코드 블록은 독립 예제이며, 파일 이름을 지정한 예제만 안내된 구조로 함께 저장합니다.
 
 ## 1. 모듈과 패키지: 주소를 붙여 코드를 나눈다
 
@@ -65,7 +67,9 @@ if __name__ == "__main__":
 
 ### Java에서는: import 문 자체가 초기화 명령은 아니다
 
-Java의 `import`는 코드에서 타입 등의 이름을 짧게 참조하도록 하는 선언입니다. import했다고 해당 클래스의 `static` 초기화 블록이 바로 실행되지는 않습니다. 클래스 초기화는 인스턴스 생성이나 특정 정적 멤버 사용 등 별도 조건에서 일어납니다. Python의 import는 모듈의 최상위 코드를 실행할 수 있다는 점이 다릅니다. [Java 클래스 초기화 조건](https://docs.oracle.com/javase/specs/jls/se21/html/jls-12.html#jls-12.4.1)
+Java의 `import`는 코드에서 타입 등의 이름을 짧게 참조하도록 하는 선언입니다. import했다고 해당 클래스의 `static` 초기화 블록이 바로 실행되지는 않습니다. 클래스 초기화는 인스턴스 생성이나 특정 정적 멤버 사용 등 별도 조건에서 일어납니다.
+
+Python의 import는 모듈의 최상위 코드를 실행할 수 있다는 점이 다릅니다. [Java 클래스 초기화 조건](https://docs.oracle.com/javase/specs/jls/se21/html/jls-12.html#jls-12.4.1)
 
 Java의 유틸리티 클래스와 `static` 메서드를 그대로 옮길 필요도 없습니다. 상태가 없는 계산이라면 Python 모듈 안의 함수로 시작하면 됩니다.
 
@@ -102,13 +106,17 @@ print(parse_amount('{"amount": 39000}'))  # 39000
 
 여기서 `type(amount) is int`는 의도적인 선택입니다. Python의 `bool`은 `int`의 하위 타입이므로 `isinstance(True, int)`는 참입니다. 외부 입력 `true`를 1원으로 받지 않으려면 이 차이를 다뤄야 합니다.
 
-복잡한 입력은 별도의 검증 계층을 둘 수 있습니다. 어느 도구를 쓰든 **타입 설명과 실행 중 검증은 별개의 책임**입니다. `Any`는 검사를 느슨하게 만드는 탈출구라서, 외부 입력 전체에 붙이면 보호가 약해집니다. 타입 힌트와 `Protocol`의 의미는 [typing 공식 문서](https://docs.python.org/3.13/library/typing.html)를 기준으로 합니다.
+복잡한 입력은 별도의 검증 계층을 둘 수 있습니다. 어느 도구를 쓰든 **타입 설명과 실행 중 검증은 별개의 책임**입니다.
+
+`Any`는 검사를 느슨하게 만드는 탈출구라서, 외부 입력 전체에 붙이면 보호가 약해집니다. 타입 힌트와 `Protocol`의 의미는 [typing 공식 문서](https://docs.python.org/3.13/library/typing.html)를 기준으로 합니다.
 
 ### Java에서는: 컴파일러가 강제하는 계약이 있다
 
 Java에서 정수 인자에 문자열을 넘기는 호출은 보통 컴파일 단계에서 거부됩니다. Python의 `count: int`는 실행기가 같은 검사를 강제한다는 뜻이 아닙니다. 정적 검사 도구를 CI에 넣을지 직접 정해야 합니다.
 
-그렇다고 Java의 타입이 JSON 입력과 업무 규칙을 모두 검증하는 것도 아닙니다. `int amount`만으로 음수가 금지되지 않고, `List<String>`도 타입 소거 때문에 런타임에 모든 원소를 자동 검증하는 스키마가 되지는 않습니다. **두 언어 모두 외부 입력 경계의 검증이 필요하고, 기본으로 강제되는 정적 검사 범위가 다릅니다.** [Java 정적 타입과 타입 소거](https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.6)
+그렇다고 Java의 타입이 JSON 입력과 업무 규칙을 모두 검증하는 것도 아닙니다. `int amount`만으로 음수가 금지되지 않고, `List<String>`도 타입 소거 때문에 런타임에 모든 원소를 자동 검증하는 스키마가 되지는 않습니다.
+
+**두 언어 모두 외부 입력 경계의 검증이 필요하고, 기본으로 강제되는 정적 검사 범위가 다릅니다.** [Java 정적 타입과 타입 소거](https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.6)
 
 ## 3. 클래스: 같이 움직이는 상태와 동작을 묶는다
 
@@ -139,15 +147,23 @@ first.orders.append(Order(1042, 39000))
 print(len(first.orders), len(second.orders))  # 1 0
 ```
 
-`dataclass`는 생성자, 표현, 동등성 비교 같은 반복 코드를 만들어 줍니다. `default_factory=list`는 인스턴스마다 새 목록을 만듭니다. 클래스 속성에 목록을 하나 두고 모든 인스턴스가 공유하는 실수를 피할 수 있습니다.
+`dataclass`는 생성자, 표현, 동등성 비교 같은 반복 코드를 만들어 줍니다.
 
-`frozen=True`는 필드의 재대입을 막는 장치입니다. 내부에 리스트가 있으면 그 리스트까지 깊게 불변으로 만들지는 않습니다. 또한 `amount: int`라는 선언만으로 문자열 입력이 자동 차단되지는 않습니다. 이 예제의 객체는 검증된 내부 데이터를 받는다는 전제입니다. 생성 규칙은 [dataclasses 공식 문서](https://docs.python.org/3.13/library/dataclasses.html)를 참고합니다.
+`default_factory=list`는 인스턴스마다 새 목록을 만듭니다. 클래스 속성에 목록을 하나 두고 모든 인스턴스가 공유하는 실수를 피할 수 있습니다.
+
+`frozen=True`는 필드의 재대입을 막는 장치입니다. 내부에 리스트가 있으면 그 리스트까지 깊게 불변으로 만들지는 않습니다.
+
+또한 `amount: int`라는 선언만으로 문자열 입력이 자동 차단되지는 않습니다. 이 예제의 객체는 검증된 내부 데이터를 받는다는 전제입니다. 생성 규칙은 [dataclasses 공식 문서](https://docs.python.org/3.13/library/dataclasses.html)를 참고합니다.
 
 ### Java에서는: record와 닮았지만 같은 기능은 아니다
 
 Java의 `record Order(int orderId, int amount)`도 데이터 전달 객체의 반복 코드를 줄입니다. Python `dataclass`와 목적은 비슷하지만, Java record의 컴포넌트 필드는 final이고 Python dataclass는 기본적으로 필드 변경이 가능합니다. `frozen=True`를 켜야 재대입을 제한합니다.
 
-둘 다 참조하는 내부 리스트까지 자동으로 불변이 되지는 않습니다. 또한 Java record는 다른 클래스를 상속할 수 없는 final 클래스인 반면, Python dataclass는 일반 클래스에 메서드 생성 등의 처리를 더하는 방식입니다. DTO를 옮길 때는 “필드 선언이 짧다”보다 변경 가능성과 검증 규칙을 맞춰야 합니다. [Java record 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.10)
+둘 다 참조하는 내부 리스트까지 자동으로 불변이 되지는 않습니다.
+
+또한 Java record는 다른 클래스를 상속할 수 없는 final 클래스인 반면, Python dataclass는 일반 클래스에 메서드 생성 등의 처리를 더하는 방식입니다.
+
+DTO를 옮길 때는 “필드 선언이 짧다”보다 변경 가능성과 검증 규칙을 맞춰야 합니다. [Java record 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.10)
 
 ### 상속보다 필요한 동작을 먼저 정한다
 
@@ -173,7 +189,9 @@ def notify_paid(order_id: int, sender: Sender) -> None:
 notify_paid(1042, ConsoleSender())
 ```
 
-`ConsoleSender`는 `Sender`를 상속하지 않습니다. 필요한 메서드의 형태가 맞는지 정적 검사 도구가 확인할 수 있습니다. 테스트에서는 수신 내용을 기록하는 가짜 발송기를, 운영에서는 실제 발송기를 전달할 수 있습니다.
+`ConsoleSender`는 `Sender`를 상속하지 않습니다. 필요한 메서드의 형태가 맞는지 정적 검사 도구가 확인할 수 있습니다.
+
+테스트에서는 수신 내용을 기록하는 가짜 발송기를, 운영에서는 실제 발송기를 전달할 수 있습니다.
 
 `Protocol`도 기본적으로 런타임 입력 검증기가 아닙니다. 상속 계층을 만들기 전에 호출자가 정말 필요한 작은 동작부터 정의하는 것이 핵심입니다.
 
@@ -203,15 +221,21 @@ print(sum(amounts))  # 39000
 print(list(amounts)) # [] — 이미 끝까지 소비했다
 ```
 
-`yield`는 값을 하나 돌려주고 다음 진행 위치를 기억합니다. 결과 목록 전체를 만들지 않아도 되지만, 입력부터 거대한 리스트로 읽었다면 그 메모리는 그대로 필요합니다. 파일 읽기부터 집계까지 흐름 전체가 조금씩 처리되어야 효과가 있습니다.
+`yield`는 값을 하나 돌려주고 다음 진행 위치를 기억합니다.
 
-제너레이터는 한 번 소비하면 끝납니다. 다시 읽어야 한다면 새로 만들거나, 크기가 감당될 때 목록으로 보관합니다. 지연 실행되므로 예외도 생성 시점이 아니라 순회 시점에 발생할 수 있습니다. 순회 모델은 [공식 클래스 문서의 이터레이터·제너레이터 절](https://docs.python.org/3.13/tutorial/classes.html#iterators)에 설명되어 있습니다.
+결과 목록 전체를 만들지 않아도 되지만, 입력부터 거대한 리스트로 읽었다면 그 메모리는 그대로 필요합니다. 파일 읽기부터 집계까지 흐름 전체가 조금씩 처리되어야 효과가 있습니다.
+
+제너레이터는 한 번 소비하면 끝납니다. 다시 읽어야 한다면 새로 만들거나, 크기가 감당될 때 목록으로 보관합니다.
+
+지연 실행되므로 예외도 생성 시점이 아니라 순회 시점에 발생할 수 있습니다. 순회 모델은 [공식 클래스 문서의 이터레이터·제너레이터 절](https://docs.python.org/3.13/tutorial/classes.html#iterators)에 설명되어 있습니다.
 
 ### Java에서는: Stream의 지연 처리와 연결해서 이해한다
 
 Java Stream의 `filter`·`map`처럼 Python 제너레이터도 필요한 시점까지 계산을 미룰 수 있습니다. 반면 `[... for ...]` 형태의 리스트 컴프리헨션은 즉시 목록을 만듭니다.
 
-Stream과 제너레이터 모두 소비 후 재사용을 기대하면 안 됩니다. 다만 끝난 Python 제너레이터를 다시 순회하면 보통 빈 결과가 나오고, Java Stream은 재사용을 감지하면 `IllegalStateException`을 던질 수 있습니다. 제너레이터 자체에 `parallelStream()` 같은 병렬 실행 기능이 붙는 것도 아닙니다. [Java Stream 계약](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html)
+Stream과 제너레이터 모두 소비 후 재사용을 기대하면 안 됩니다. 다만 끝난 Python 제너레이터를 다시 순회하면 보통 빈 결과가 나오고, Java Stream은 재사용을 감지하면 `IllegalStateException`을 던질 수 있습니다.
+
+제너레이터 자체에 `parallelStream()` 같은 병렬 실행 기능이 붙는 것도 아닙니다. [Java Stream 계약](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html)
 
 ## 5. 함수도 객체다: 데코레이터는 포장지
 
@@ -241,13 +265,17 @@ def total(prices):
 print(total([12000, 27000]))  # 실행 시간 다음에 39000 출력
 ```
 
-`@timed`는 대략 `total = timed(total)`과 같습니다. `wrapper`는 바깥의 `func`를 기억하는 클로저입니다. `wraps`는 원래 함수의 이름과 문서 등의 메타데이터를 보존합니다. [functools 공식 문서](https://docs.python.org/3.13/library/functools.html#functools.wraps)
+`@timed`는 대략 `total = timed(total)`과 같습니다. `wrapper`는 바깥의 `func`를 기억하는 클로저입니다.
+
+`wraps`는 원래 함수의 이름과 문서 등의 메타데이터를 보존합니다. [functools 공식 문서](https://docs.python.org/3.13/library/functools.html#functools.wraps)
 
 이 예제는 동기 함수용입니다. 비동기 함수에 그대로 붙이면 코루틴 객체를 만드는 시간만 재고 실제 완료 시간은 재지 못합니다. 데코레이터를 붙이면 실행 계약도 맞는지 확인해야 합니다.
 
 ### Java에서는: annotation과 같은 기호, 다른 동작
 
-Java의 `@Override` 같은 annotation은 메타데이터이며 컴파일러나 도구가 해석합니다. Python의 `@timed`는 정의 시점에 데코레이터를 적용해 함수를 감싸거나 바꿉니다. Java에서도 프레임워크가 annotation을 읽어 프록시 등의 동작을 붙일 수 있지만, annotation 문법 자체가 함수 래핑을 뜻하지는 않습니다. [Java annotation 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html#jls-9.7)
+Java의 `@Override` 같은 annotation은 메타데이터이며 컴파일러나 도구가 해석합니다. Python의 `@timed`는 정의 시점에 데코레이터를 적용해 함수를 감싸거나 바꿉니다.
+
+Java에서도 프레임워크가 annotation을 읽어 프록시 등의 동작을 붙일 수 있지만, annotation 문법 자체가 함수 래핑을 뜻하지는 않습니다. [Java annotation 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html#jls-9.7)
 
 ## 6. 예외와 with: 실패와 정리도 정상 경로다
 
@@ -277,7 +305,11 @@ print(parse_order_id("1042"))  # 1042
 | `finally` | 성공·실패와 관계없이 필요한 정리 |
 | `with` | 자원 획득과 종료 규약을 한 블록에 묶기 |
 
-`except Exception: pass`로 삼키면 실패한 주문이 정상 처리된 것처럼 보일 수 있습니다. 반대로 모든 계층에서 같은 예외를 로그로 남기면 한 번의 실패가 여러 건처럼 보입니다. 처리할 수 없는 예외는 올리고, 요청이나 작업의 경계에서 한 번 기록하는 기준이 유용합니다. [공식 예외 처리 문서](https://docs.python.org/3.13/tutorial/errors.html)
+`except Exception: pass`로 삼키면 실패한 주문이 정상 처리된 것처럼 보일 수 있습니다.
+
+반대로 모든 계층에서 같은 예외를 로그로 남기면 한 번의 실패가 여러 건처럼 보입니다.
+
+처리할 수 없는 예외는 올리고, 요청이나 작업의 경계에서 한 번 기록하는 기준이 유용합니다. [공식 예외 처리 문서](https://docs.python.org/3.13/tutorial/errors.html)
 
 ### 파일은 읽기만큼 닫기도 중요하다
 
@@ -297,11 +329,17 @@ with TemporaryDirectory() as directory:
     print(order["id"])  # 1042
 ```
 
-JSON 파싱에 실패해도 파일의 컨텍스트 관리자는 닫기를 수행합니다. 파일뿐 아니라 락, 트랜잭션 등도 해당 객체가 제공하는 컨텍스트 관리 규약으로 수명을 명확히 할 수 있습니다. 다만 모든 `with`가 커밋을 뜻하는 것은 아닙니다. 종료 동작은 객체마다 다릅니다.
+JSON 파싱에 실패해도 파일의 컨텍스트 관리자는 닫기를 수행합니다.
+
+파일뿐 아니라 락, 트랜잭션 등도 해당 객체가 제공하는 컨텍스트 관리 규약으로 수명을 명확히 할 수 있습니다.
+
+다만 모든 `with`가 커밋을 뜻하는 것은 아닙니다. 종료 동작은 객체마다 다릅니다.
 
 ### Java에서는: try-with-resources와 연결하되 예외 계약은 다르다
 
-Java의 try-with-resources는 `AutoCloseable` 자원의 `close()`를 호출합니다. Python의 `with`는 컨텍스트 관리자의 진입·종료 메서드를 호출하며, 파일 닫기 외에도 여러 규약을 표현할 수 있습니다. 종료 메서드가 예외를 억제할 수도 있으므로 사용하는 관리자의 계약을 확인합니다. [Java try-with-resources](https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.20.3)
+Java의 try-with-resources는 `AutoCloseable` 자원의 `close()`를 호출합니다. Python의 `with`는 컨텍스트 관리자의 진입·종료 메서드를 호출하며, 파일 닫기 외에도 여러 규약을 표현할 수 있습니다.
+
+종료 메서드가 예외를 억제할 수도 있으므로 사용하는 관리자의 계약을 확인합니다. [Java try-with-resources](https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.20.3)
 
 또한 Python에는 Java의 checked exception처럼 호출자가 잡거나 선언하도록 컴파일러가 강제하는 예외 구분이 없습니다. 호출자가 처리할 실패 종류를 문서와 테스트로 드러내는 일이 더 중요합니다. [Java 예외 검사 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html#jls-11.2)
 
