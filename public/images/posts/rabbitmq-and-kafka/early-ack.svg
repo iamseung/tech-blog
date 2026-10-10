@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <rect width="960" height="330" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <!-- axis -->
+  <line x1="150" y1="290" x2="930" y2="290" stroke="#B5B4BA"/>
+  <g font-size="11" fill="#6B6B70" text-anchor="middle">
+    <text x="150" y="308">0분</text><text x="410" y="308">30분</text><text x="670" y="308">60분</text><text x="930" y="308">90분</text>
+  </g>
+  <line x1="410" y1="40" x2="410" y2="290" stroke="#A33A20" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="416" y="52" font-size="12" fill="#A33A20">consumer_timeout (기본 30분)</text>
+
+  <!-- late ack -->
+  <text x="30" y="100" font-size="14" font-weight="600" fill="#1D1D1F">끝나고 ack</text>
+  <rect x="150" y="80" width="260" height="30" rx="4" fill="#ECEAF5" stroke="#B9B0DD"/>
+  <text x="280" y="100" font-size="12" text-anchor="middle" fill="#1D1D1F">작업 실행 중 · ack 대기</text>
+  <rect x="410" y="80" width="80" height="30" rx="4" fill="#FBEDEA" stroke="#A33A20"/>
+  <text x="450" y="100" font-size="11" text-anchor="middle" fill="#A33A20">채널 강제 종료</text>
+  <rect x="500" y="80" width="300" height="30" rx="4" fill="#FBEDEA" stroke="#A33A20" stroke-dasharray="5 3"/>
+  <text x="650" y="100" font-size="12" text-anchor="middle" fill="#A33A20">다른 소비자가 같은 작업을 처음부터 다시</text>
+
+  <!-- early ack -->
+  <text x="30" y="190" font-size="14" font-weight="600" fill="#1D1D1F">claim 후 ack</text>
+  <rect x="150" y="170" width="60" height="30" rx="4" fill="#E3F2EF" stroke="#0B6B5E"/>
+  <text x="180" y="190" font-size="11" text-anchor="middle" fill="#0B6B5E">claim</text>
+  <line x1="214" y1="160" x2="214" y2="210" stroke="#0B6B5E" stroke-width="2.5"/>
+  <text x="220" y="156" font-size="11" fill="#0B6B5E">ack (책임 이관)</text>
+  <rect x="218" y="170" width="582" height="30" rx="4" fill="#ECEAF5" stroke="#B9B0DD"/>
+  <text x="510" y="190" font-size="12" text-anchor="middle" fill="#1D1D1F">작업 실행 · 진행 상태는 DB 가 추적 · timeout 무관</text>
+  <rect x="150" y="226" width="650" height="36" rx="4" fill="#FFFFFF" stroke="#D9D8DE"/>
+  <text x="475" y="249" font-size="12" text-anchor="middle" fill="#6B6B70">대가: 소비자가 죽어도 브로커는 다시 주지 않는다 → 멈춘 작업을 찾아 되살리는 복구 로직이 필요</text>
+</svg>

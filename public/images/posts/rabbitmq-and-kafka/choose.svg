@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#6B6B70"/></marker></defs>
+  <rect width="960" height="360" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <rect x="330" y="24" width="300" height="50" rx="8" fill="#FFFFFF" stroke="#B5B4BA"/>
+  <text x="480" y="54" font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">이 메시지, 처리하고 나면 필요 없나?</text>
+  <path d="M400,74 L240,124" stroke="#6B6B70" stroke-width="1.5" fill="none" marker-end="url(#m)"/>
+  <path d="M560,74 L720,124" stroke="#6B6B70" stroke-width="1.5" fill="none" marker-end="url(#m)"/>
+  <text x="300" y="100" font-size="12" text-anchor="end" fill="#6B6B70">예 · 작업 지시서</text>
+  <text x="662" y="100" font-size="12" fill="#6B6B70">아니오 · 사실의 기록</text>
+
+  <rect x="40" y="128" width="400" height="200" rx="8" fill="#F0ECFB" stroke="#5B3FB8" stroke-width="1.5"/>
+  <text x="60" y="160" font-size="17" font-weight="700" fill="#5B3FB8">RabbitMQ</text>
+  <g font-size="13" fill="#1D1D1F">
+    <text x="60" y="190">· 무거운 작업을 소비자 N 대가 나눠 처리</text>
+    <text x="60" y="214">· 메시지마다 재시도·지연·폐기를 다르게</text>
+    <text x="60" y="238">· 응답을 기다리는 RPC</text>
+    <text x="60" y="262">· 모든 인스턴스에 보내는 제어 신호</text>
+    <text x="60" y="286">· 단일 브로커로 작게 시작</text>
+  </g>
+  <text x="60" y="314" font-size="12" fill="#6B6B70">예) 주문 확인 메일, 영수증 PDF 생성, 배송사 API 호출</text>
+
+  <rect x="520" y="128" width="400" height="200" rx="8" fill="#E3EEF1" stroke="#135E73" stroke-width="1.5"/>
+  <text x="540" y="160" font-size="17" font-weight="700" fill="#135E73">Kafka</text>
+  <g font-size="13" fill="#1D1D1F">
+    <text x="540" y="190">· 같은 이벤트를 여러 팀이 각자 읽는다</text>
+    <text x="540" y="214">· 버그를 고친 뒤 과거부터 다시 처리</text>
+    <text x="540" y="238">· 엔티티(key)별 순서가 중요하다</text>
+    <text x="540" y="262">· 초당 수만~수십만 건의 스트림</text>
+    <text x="540" y="286">· CDC, 이벤트 소싱, 지표 파이프라인</text>
+  </g>
+  <text x="540" y="314" font-size="12" fill="#6B6B70">예) 주문 이벤트를 정산·추천·대시보드가 각각 소비</text>
+</svg>

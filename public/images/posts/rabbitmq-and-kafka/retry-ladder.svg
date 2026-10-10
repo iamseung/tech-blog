@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#5B3FB8"/></marker>
+    <marker id="w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#A33A20"/></marker>
+    <marker id="d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#9A5A0A"/></marker>
+  </defs>
+  <rect width="960" height="400" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <g font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">
+    <rect x="30" y="60" width="150" height="60" rx="6" fill="#F0ECFB" stroke="#5B3FB8" stroke-width="1.5"/><text x="105" y="88">app.events</text>
+    <rect x="240" y="60" width="170" height="60" rx="6" fill="#FFFFFF" stroke="#B9B0DD"/><text x="325" y="88">메인 큐</text>
+    <rect x="470" y="60" width="150" height="60" rx="6" fill="#ECEAF5" stroke="#B9B0DD"/><text x="545" y="88">Consumer</text>
+  </g>
+  <text x="105" y="106" font-size="11" text-anchor="middle" fill="#6B6B70">topic exchange</text>
+  <text x="325" y="106" font-size="11" text-anchor="middle" fill="#6B6B70">DLX 없음</text>
+  <text x="545" y="106" font-size="11" text-anchor="middle" fill="#6B6B70">실패를 분류한다</text>
+  <g stroke="#5B3FB8" stroke-width="1.8" fill="none">
+    <path d="M180,90 H236" marker-end="url(#a)"/><path d="M410,90 H466" marker-end="url(#a)"/>
+  </g>
+
+  <!-- retry tiers -->
+  <g font-size="13" text-anchor="middle" fill="#1D1D1F">
+    <rect x="200" y="200" width="130" height="50" rx="6" fill="#FBF3E6" stroke="#9A5A0A"/><text x="265" y="222" font-weight="600">retry-2s</text><text x="265" y="240" font-size="11" fill="#6B6B70">TTL 2초</text>
+    <rect x="350" y="200" width="130" height="50" rx="6" fill="#FBF3E6" stroke="#9A5A0A"/><text x="415" y="222" font-weight="600">retry-8s</text><text x="415" y="240" font-size="11" fill="#6B6B70">TTL 8초</text>
+    <rect x="500" y="200" width="130" height="50" rx="6" fill="#FBF3E6" stroke="#9A5A0A"/><text x="565" y="222" font-weight="600">retry-30s</text><text x="565" y="240" font-size="11" fill="#6B6B70">TTL 30초</text>
+  </g>
+  <path d="M545,120 V160 H415 V196" stroke="#9A5A0A" stroke-width="1.6" fill="none" marker-end="url(#d)"/>
+  <text x="120" y="185" font-size="12" fill="#9A5A0A">일시적 실패 → 다음 tier 로 publish, 원본은 ack</text>
+  <path d="M415,254 V300 H105 V124" stroke="#9A5A0A" stroke-width="1.6" fill="none" stroke-dasharray="6 4" marker-end="url(#d)"/>
+  <text x="120" y="292" font-size="12" fill="#9A5A0A">TTL 만료 → dead-letter → 원래 exchange 로 복귀</text>
+
+  <!-- DLQ -->
+  <rect x="700" y="200" width="120" height="50" rx="6" fill="#FBEDEA" stroke="#A33A20"/>
+  <text x="760" y="230" font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">DLQ</text>
+  <rect x="700" y="300" width="230" height="50" rx="6" fill="#FFFFFF" stroke="#D9D8DE"/>
+  <text x="815" y="322" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">사람이 본다 · 알림 · 재주입</text>
+  <text x="815" y="340" font-size="11" text-anchor="middle" fill="#6B6B70">예외 클래스·재시도 횟수를 헤더에</text>
+  <path d="M620,95 C700,100 760,150 760,196" stroke="#A33A20" stroke-width="1.6" fill="none" marker-end="url(#w)"/>
+  <text x="790" y="150" font-size="12" fill="#A33A20">영구 실패 · 재시도 소진</text>
+  <path d="M760,250 V296" stroke="#A33A20" stroke-width="1.6" fill="none" marker-end="url(#w)"/>
+  <text x="30" y="372" font-size="12" fill="#6B6B70">tier 마다 큐를 따로 두는 이유: 메시지별 TTL 은 큐 맨 앞에 와야 만료된다. 고정 TTL 큐면 앞뒤 순서가 뒤집히지 않는다.</text>
+</svg>

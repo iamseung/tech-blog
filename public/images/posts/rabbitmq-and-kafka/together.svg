@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#135E73"/></marker>
+    <marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#5B3FB8"/></marker>
+  </defs>
+  <rect width="960" height="470" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <rect x="30" y="40" width="170" height="60" rx="6" fill="#FFFFFF" stroke="#B5B4BA"/>
+  <text x="115" y="66" font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">주문 서비스</text>
+  <text x="115" y="86" font-size="11" text-anchor="middle" fill="#6B6B70">결제 완료 처리</text>
+  <path d="M200,70 H306" stroke="#135E73" stroke-width="1.8" fill="none" marker-end="url(#t)"/>
+  <text x="253" y="60" font-size="11" text-anchor="middle" fill="#135E73">"주문 1042 결제됨"</text>
+  <rect x="310" y="36" width="330" height="68" rx="6" fill="#E3EEF1" stroke="#135E73" stroke-width="1.5"/>
+  <text x="475" y="64" font-size="15" font-weight="700" text-anchor="middle" fill="#135E73">Kafka · topic orders</text>
+  <text x="475" y="86" font-size="11" text-anchor="middle" fill="#1D1D1F">key = orderId · 사실의 기록 · 보존</text>
+  <text x="670" y="66" font-size="13" font-weight="600" fill="#135E73">장부</text>
+  <text x="670" y="86" font-size="11" fill="#6B6B70">여러 팀이 오래 두고 읽는다</text>
+
+  <g stroke="#135E73" stroke-width="1.6" fill="none">
+    <path d="M400,104 C400,140 160,130 160,166" marker-end="url(#t)"/>
+    <path d="M475,104 V166" marker-end="url(#t)"/>
+    <path d="M550,104 C550,140 790,130 790,166" marker-end="url(#t)"/>
+  </g>
+  <g font-size="13" text-anchor="middle" fill="#1D1D1F">
+    <rect x="70" y="170" width="180" height="56" rx="6" fill="#FFFFFF" stroke="#9CC3CF"/><text x="160" y="194" font-weight="600">group settlement</text><text x="160" y="213" font-size="11" fill="#6B6B70">판매자 정산</text>
+    <rect x="385" y="170" width="180" height="56" rx="6" fill="#FFFFFF" stroke="#9CC3CF"/><text x="475" y="194" font-weight="600">group recommendation</text><text x="475" y="213" font-size="11" fill="#6B6B70">구매 이력 학습</text>
+    <rect x="700" y="170" width="180" height="56" rx="6" fill="#FFFFFF" stroke="#9CC3CF"/><text x="790" y="194" font-weight="600">group notification</text><text x="790" y="213" font-size="11" fill="#6B6B70">할 일을 만들어 넘긴다</text>
+  </g>
+  <path d="M790,226 V276" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#p)"/>
+  <text x="800" y="256" font-size="11" fill="#5B3FB8">"1042 확인 메일 보내라"</text>
+  <rect x="640" y="280" width="300" height="68" rx="6" fill="#F0ECFB" stroke="#5B3FB8" stroke-width="1.5"/>
+  <text x="790" y="308" font-size="15" font-weight="700" text-anchor="middle" fill="#5B3FB8">RabbitMQ · queue order.email</text>
+  <text x="790" y="330" font-size="11" text-anchor="middle" fill="#1D1D1F">retry 2s · 8s · 30s → DLQ</text>
+  <text x="620" y="308" font-size="13" font-weight="600" text-anchor="end" fill="#5B3FB8">배달부</text>
+  <text x="620" y="328" font-size="11" text-anchor="end" fill="#6B6B70">한 번 처리하면 끝, 실패하면 재시도</text>
+  <path d="M790,348 V392" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#p)"/>
+  <rect x="690" y="396" width="200" height="48" rx="6" fill="#ECEAF5" stroke="#B9B0DD"/>
+  <text x="790" y="425" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">메일 발송 워커 × N</text>
+</svg>

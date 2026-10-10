@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 270" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <rect width="960" height="270" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <text x="30" y="40" font-size="14" font-weight="700" fill="#1D1D1F">커밋 → 처리 : at-most-once</text>
+  <g font-size="12" text-anchor="middle">
+    <rect x="30" y="56" width="100" height="34" rx="4" fill="#FFFFFF" stroke="#B5B4BA"/><text x="80" y="78" fill="#1D1D1F">poll 0–99</text>
+    <rect x="140" y="56" width="120" height="34" rx="4" fill="#FBF3E6" stroke="#9A5A0A"/><text x="200" y="78" fill="#9A5A0A">commit 100</text>
+    <rect x="270" y="56" width="170" height="34" rx="4" fill="#FFFFFF" stroke="#B5B4BA"/><text x="355" y="78" fill="#1D1D1F">처리 0 … 41</text>
+    <rect x="450" y="56" width="80" height="34" rx="4" fill="#FBEDEA" stroke="#A33A20"/><text x="490" y="78" fill="#A33A20">장애</text>
+    <rect x="540" y="56" width="160" height="34" rx="4" fill="#FFFFFF" stroke="#B5B4BA"/><text x="620" y="78" fill="#1D1D1F">재시작 → 100 부터</text>
+  </g>
+  <text x="712" y="78" font-size="12" fill="#A33A20">42–99 는 영영 처리 안 됨</text>
+
+  <text x="30" y="140" font-size="14" font-weight="700" fill="#1D1D1F">처리 → 커밋 : at-least-once</text>
+  <g font-size="12" text-anchor="middle">
+    <rect x="30" y="156" width="100" height="34" rx="4" fill="#FFFFFF" stroke="#B5B4BA"/><text x="80" y="178" fill="#1D1D1F">poll 0–99</text>
+    <rect x="140" y="156" width="170" height="34" rx="4" fill="#FFFFFF" stroke="#B5B4BA"/><text x="225" y="178" fill="#1D1D1F">처리 0 … 41</text>
+    <rect x="320" y="156" width="80" height="34" rx="4" fill="#FBEDEA" stroke="#A33A20"/><text x="360" y="178" fill="#A33A20">장애</text>
+    <rect x="410" y="156" width="150" height="34" rx="4" fill="#FFFFFF" stroke="#B5B4BA"/><text x="485" y="178" fill="#1D1D1F">재시작 → 0 부터</text>
+    <rect x="570" y="156" width="130" height="34" rx="4" fill="#FBF3E6" stroke="#9A5A0A"/><text x="635" y="178" fill="#9A5A0A">처리 후 commit</text>
+  </g>
+  <text x="712" y="178" font-size="12" fill="#135E73">0–41 두 번 처리 → 멱등성으로 흡수</text>
+  <text x="30" y="236" font-size="12" fill="#6B6B70">Kafka 는 메시지 하나가 아니라 "여기까지" 라는 위치를 커밋한다. 100 을 커밋하면 그 앞은 전부 처리한 것으로 본다.</text>
+</svg>

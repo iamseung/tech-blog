@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#5B3FB8"/></marker>
+    <marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#135E73"/></marker>
+  </defs>
+  <rect width="960" height="440" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+
+  <!-- RabbitMQ -->
+  <text x="30" y="42" font-size="18" font-weight="700" fill="#5B3FB8">RabbitMQ · 배달부</text>
+  <text x="30" y="64" font-size="13" fill="#6B6B70">브로커가 주소를 보고 사서함에 넣고, 받으면 지운다</text>
+  <rect x="30" y="150" width="90" height="56" rx="6" fill="#ECEAF5" stroke="#B9B0DD"/>
+  <text x="75" y="183" font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">Producer</text>
+  <rect x="160" y="140" width="110" height="76" rx="6" fill="#F0ECFB" stroke="#5B3FB8" stroke-width="1.5"/>
+  <text x="215" y="172" font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">Exchange</text>
+  <text x="215" y="192" font-size="11" text-anchor="middle" fill="#6B6B70">규칙만 평가</text>
+  <rect x="320" y="96" width="120" height="52" rx="6" fill="#FFFFFF" stroke="#B9B0DD"/>
+  <text x="380" y="118" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">Queue A</text>
+  <rect x="340" y="128" width="12" height="9" fill="#5B3FB8"/><rect x="356" y="128" width="12" height="9" fill="#5B3FB8" opacity=".6"/><rect x="372" y="128" width="12" height="9" fill="#5B3FB8" opacity=".35"/>
+  <rect x="320" y="208" width="120" height="52" rx="6" fill="#FFFFFF" stroke="#B9B0DD"/>
+  <text x="380" y="230" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">Queue B</text>
+  <rect x="340" y="240" width="12" height="9" fill="#5B3FB8"/>
+  <path d="M120,178 H156" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#ap)"/>
+  <path d="M270,166 C295,166 295,122 316,122" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#ap)"/>
+  <path d="M270,192 C295,192 295,234 316,234" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#ap)"/>
+  <text x="200" y="128" font-size="11" fill="#5B3FB8">routing key</text>
+  <rect x="330" y="300" width="100" height="40" rx="6" fill="#ECEAF5" stroke="#B9B0DD"/>
+  <text x="380" y="325" font-size="12" text-anchor="middle" fill="#1D1D1F">Consumer</text>
+  <path d="M380,262 V296" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#ap)"/>
+  <text x="390" y="284" font-size="11" fill="#5B3FB8">push</text>
+  <text x="30" y="380" font-size="13" fill="#1D1D1F">ack 하면 큐에서 사라진다 → 다시 읽을 수 없다</text>
+  <text x="30" y="402" font-size="13" fill="#1D1D1F">재시도·지연·폐기 경로를 브로커가 들고 있다</text>
+
+  <line x1="480" y1="30" x2="480" y2="410" stroke="#D9D8DE" stroke-dasharray="5 5"/>
+
+  <!-- Kafka -->
+  <text x="510" y="42" font-size="18" font-weight="700" fill="#135E73">Kafka · 장부</text>
+  <text x="510" y="64" font-size="13" fill="#6B6B70">브로커는 적기만 하고, 어디까지 읽었는지는 독자가 기억한다</text>
+  <rect x="510" y="150" width="90" height="56" rx="6" fill="#E3EEF1" stroke="#9CC3CF"/>
+  <text x="555" y="183" font-size="14" font-weight="600" text-anchor="middle" fill="#1D1D1F">Producer</text>
+  <path d="M600,178 H636" stroke="#135E73" stroke-width="1.8" fill="none" marker-end="url(#at)"/>
+  <text x="640" y="134" font-size="12" font-weight="600" fill="#1D1D1F">partition 0 (추가 전용 로그)</text>
+  <g font-size="11" text-anchor="middle" fill="#1D1D1F">
+    <rect x="640" y="160" width="34" height="34" fill="#FFFFFF" stroke="#9CC3CF"/><text x="657" y="182">0</text>
+    <rect x="674" y="160" width="34" height="34" fill="#FFFFFF" stroke="#9CC3CF"/><text x="691" y="182">1</text>
+    <rect x="708" y="160" width="34" height="34" fill="#FFFFFF" stroke="#9CC3CF"/><text x="725" y="182">2</text>
+    <rect x="742" y="160" width="34" height="34" fill="#FFFFFF" stroke="#9CC3CF"/><text x="759" y="182">3</text>
+    <rect x="776" y="160" width="34" height="34" fill="#FFFFFF" stroke="#9CC3CF"/><text x="793" y="182">4</text>
+    <rect x="810" y="160" width="34" height="34" fill="#FFFFFF" stroke="#9CC3CF"/><text x="827" y="182">5</text>
+    <rect x="844" y="160" width="34" height="34" fill="#DDEFF3" stroke="#135E73"/><text x="861" y="182">6</text>
+  </g>
+  <text x="830" y="214" font-size="11" fill="#135E73">새 기록은 끝에만 붙는다</text>
+  <line x1="742" y1="150" x2="742" y2="240" stroke="#9A5A0A" stroke-width="2.5"/>
+  <line x1="674" y1="150" x2="674" y2="290" stroke="#135E73" stroke-width="2.5"/>
+  <rect x="700" y="244" width="180" height="32" rx="6" fill="#FBF3E6" stroke="#9A5A0A"/>
+  <text x="790" y="265" font-size="12" text-anchor="middle" fill="#1D1D1F">그룹 billing · 다음 offset 3</text>
+  <rect x="640" y="294" width="190" height="32" rx="6" fill="#E3EEF1" stroke="#135E73"/>
+  <text x="735" y="315" font-size="12" text-anchor="middle" fill="#1D1D1F">그룹 analytics · 다음 offset 1</text>
+  <text x="510" y="380" font-size="13" fill="#1D1D1F">읽어도 지워지지 않는다 → 그룹마다 따로, 되감아 다시 읽는다</text>
+  <text x="510" y="402" font-size="13" fill="#1D1D1F">실패 처리는 애플리케이션이 패턴으로 만든다</text>
+</svg>
