@@ -3,6 +3,7 @@ title: 'Python A to Z (2): 함수에서 프로그램으로'
 description: 'Java의 타입·record·interface·Stream과 비교하며 Python의 모듈, 객체, 제너레이터, 예외 처리 경계를 만듭니다.'
 slug: python-a-to-z-2
 publishedAt: '2026-10-10'
+updatedAt: '2026-10-11'
 tags: [Python, 설계, 타입힌트]
 series: python-a-to-z
 seriesOrder: 2
@@ -57,7 +58,33 @@ if __name__ == "__main__":
     main()
 ```
 
-프로젝트 루트에서 `python -m orders.main`으로 실행합니다. `__init__.py`는 비워 두어도 됩니다. 여기서는 일반 패키지 구조를 사용하며, 해당 파일이 없는 namespace package는 별도 기능입니다.
+프로젝트 루트에서 `python -m orders.main`으로 실행합니다.
+
+### `__init__.py`: 디렉터리를 패키지로 만드는 파일
+
+`__init__.py`는 **"이 디렉터리는 패키지다"라고 표시하고, 패키지를 처음 import할 때 실행되는 파일**입니다. 위 구조에서 `orders/` 디렉터리가 `orders` 패키지가 되는 이유가 이 파일입니다.
+
+대부분은 비워 둡니다. 빈 파일이어도 패키지 표시 역할은 그대로 합니다.
+
+내용을 채우는 흔한 이유는 **패키지의 공개 이름을 한곳에 모으기 위해서**입니다. `orders/__init__.py`를 다음처럼 작성하면 사용하는 쪽은 내부 모듈 이름을 몰라도 됩니다.
+
+```python
+print("orders 패키지 초기화")
+
+from orders.pricing import total_amount
+
+__all__ = ["total_amount"]
+```
+
+이제 `orders/main.py`에서 `from orders.pricing import total_amount` 대신 `from orders import total_amount`로 가져올 수 있습니다. `__all__`은 `from orders import *`를 실행했을 때 내보낼 이름 목록입니다.
+
+이 상태로 `python -m orders.main`을 실행하면 `orders 패키지 초기화`가 먼저 출력되고 그다음 `42000`이 출력됩니다. `orders.main`을 불러오기 전에 상위 패키지인 `orders`의 `__init__.py`가 먼저 실행되기 때문입니다. 확인이 끝나면 `print` 줄은 지웁니다.
+
+그래서 `__init__.py`에는 DB 연결이나 무거운 계산을 두지 않습니다. 패키지 안의 어떤 모듈을 import해도 이 파일이 먼저 실행됩니다.
+
+`__init__.py`가 없어도 Python 3.3부터는 import가 동작합니다. 이 경우 여러 위치의 디렉터리를 하나의 이름으로 합칠 수 있는 **namespace package**로 취급되며, 일반 패키지와는 동작이 다릅니다. 직접 만드는 애플리케이션 코드라면 `__init__.py`를 두는 편이 의도가 분명합니다. [패키지 공식 문서](https://docs.python.org/3.13/tutorial/modules.html#packages)
+
+Java와 비교하면 Java의 패키지는 디렉터리와 `package` 선언으로 정해지며, 패키지를 불러올 때 실행되는 코드는 없습니다. `package-info.java`도 문서와 애노테이션을 담는 파일입니다. Python의 `__init__.py`는 실제로 실행되는 코드라는 점이 다릅니다.
 
 ### import도 코드를 실행한다
 

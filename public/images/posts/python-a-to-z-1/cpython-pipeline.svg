@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 336" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" role="img">
+  <title>CPython의 컴파일과 실행</title>
+  <defs>
+    <marker id="t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#135E73"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#9A5A0A"/></marker>
+  </defs>
+  <rect width="960" height="336" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <text x="30" y="40" font-size="15" font-weight="700" fill="#1D1D1F">python main.py 한 번에 일어나는 일</text>
+  <text x="30" y="60" font-size="12" fill="#6B6B70">컴파일과 실행이 한 명령 안에서 이어진다. 개발자 눈에는 실행만 보인다.</text>
+  <rect x="200" y="76" width="730" height="96" rx="8" fill="#E3EEF1" stroke="#135E73" stroke-dasharray="5 4"/>
+  <text x="216" y="96" font-size="12" font-weight="600" fill="#135E73">CPython 내부</text>
+  <rect x="30" y="106" width="140" height="52" rx="6" fill="#FFFFFF" stroke="#B5B4BA"/><text x="100" y="130" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">main.py</text><text x="100" y="148" font-size="11" text-anchor="middle" fill="#6B6B70">텍스트 소스</text>
+  <rect x="216" y="106" width="150" height="52" rx="6" fill="#FFFFFF" stroke="#9CC3CE"/><text x="291" y="130" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">① 구문 분석</text><text x="291" y="148" font-size="11" text-anchor="middle" fill="#6B6B70">문법 오류는 여기서 멈춘다</text>
+  <rect x="400" y="106" width="190" height="52" rx="6" fill="#FFFFFF" stroke="#9CC3CE"/><text x="495" y="130" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">② 바이트코드로 컴파일</text><text x="495" y="148" font-size="11" text-anchor="middle" fill="#6B6B70">CPython 이 읽는 명령 목록</text>
+  <rect x="624" y="106" width="290" height="52" rx="6" fill="#FFFFFF" stroke="#135E73"/><text x="769" y="130" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">③ 실행기가 명령을 하나씩 실행</text><text x="769" y="148" font-size="11" text-anchor="middle" fill="#6B6B70">print 같은 코드는 이때 동작한다</text>
+  <rect x="400" y="220" width="300" height="64" rx="6" fill="#FBF3E6" stroke="#9A5A0A"/><text x="550" y="244" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">__pycache__/orders.cpython-313.pyc</text><text x="550" y="262" font-size="11" text-anchor="middle" fill="#6B6B70">import 한 모듈의 바이트코드를 저장</text>
+  <g stroke="#135E73" stroke-width="1.8" fill="none">
+    <path d="M170,132 H212" marker-end="url(#t)"/><path d="M366,132 H396" marker-end="url(#t)"/><path d="M590,132 H620" marker-end="url(#t)"/>
+  </g>
+  <path d="M495,158 V216" stroke="#9A5A0A" stroke-width="1.6" fill="none" marker-end="url(#o)"/>
+  <text x="484" y="196" font-size="12" text-anchor="end" fill="#9A5A0A">import orders 한 모듈만</text>
+  <path d="M700,236 C760,236 769,200 769,162" stroke="#9A5A0A" stroke-width="1.6" fill="none" stroke-dasharray="4 3" marker-end="url(#o)"/>
+  <text x="716" y="262" font-size="12" fill="#9A5A0A">다음 실행 때 소스가 그대로면</text>
+  <text x="716" y="280" font-size="12" fill="#9A5A0A">①② 를 건너뛰고 바로 읽는다</text>
+  <text x="30" y="318" font-size="12" fill="#6B6B70">main.py 처럼 직접 실행한 파일은 .pyc 로 남기지 않는다. .pyc 는 기계어 실행 파일이 아니라 컴파일 결과를 담아 둔 캐시다.</text>
+</svg>

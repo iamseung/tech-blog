@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" role="img">
+  <title>프로젝트마다 별도의 .venv</title>
+  <defs><marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#5B3FB8"/></marker></defs>
+  <rect width="960" height="340" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <text x="30" y="40" font-size="15" font-weight="700" fill="#1D1D1F">프로젝트마다 .venv 를 따로 둔다</text>
+  <text x="30" y="60" font-size="12" fill="#6B6B70">venv 는 환경을 만드는 모듈, .venv 는 그 모듈이 만든 디렉터리</text>
+
+  <rect x="30" y="84" width="250" height="216" rx="8" fill="#F0ECFB" stroke="#5B3FB8" stroke-width="1.5"/>
+  <text x="50" y="112" font-size="14" font-weight="700" fill="#5B3FB8">현재 터미널 · A 활성화 후</text>
+  <text x="50" y="140" font-size="12" fill="#1D1D1F">PATH 맨 앞에 A/.venv/bin 추가</text>
+  <rect x="46" y="156" width="218" height="60" rx="4" fill="#FFFFFF" stroke="#B9B0DD"/>
+  <text x="60" y="180" font-size="13" font-weight="600" fill="#1D1D1F">$ python</text>
+  <text x="60" y="203" font-size="12" fill="#5B3FB8">→ A/.venv/bin/python</text>
+  <text x="50" y="246" font-size="12" fill="#6B6B70">cd project-b 만으로는</text>
+  <text x="50" y="266" font-size="12" fill="#6B6B70">B 환경으로 바뀌지 않는다</text>
+
+  <rect x="330" y="84" width="290" height="216" rx="8" fill="#FFFFFF" stroke="#B5B4BA"/>
+  <text x="350" y="112" font-size="14" font-weight="700" fill="#1D1D1F">project-a/</text>
+  <text x="350" y="134" font-size="12" fill="#6B6B70">main.py · requirements.txt</text>
+  <rect x="346" y="150" width="258" height="134" rx="6" fill="#E3EEF1" stroke="#135E73" stroke-width="1.5"/>
+  <text x="362" y="174" font-size="13" font-weight="700" fill="#135E73">.venv/</text>
+  <rect x="362" y="186" width="226" height="36" rx="4" fill="#FFFFFF" stroke="#9CC3CE"/>
+  <text x="376" y="209" font-size="12" font-weight="600" fill="#1D1D1F">bin/python</text>
+  <text x="574" y="209" font-size="12" text-anchor="end" fill="#6B6B70">실행 파일</text>
+  <rect x="362" y="232" width="226" height="36" rx="4" fill="#FFFFFF" stroke="#9CC3CE"/>
+  <text x="376" y="255" font-size="12" font-weight="600" fill="#1D1D1F">site-packages/</text>
+  <text x="574" y="255" font-size="12" font-weight="700" text-anchor="end" fill="#135E73">라이브러리 1.x</text>
+
+  <rect x="650" y="84" width="280" height="216" rx="8" fill="#FFFFFF" stroke="#B5B4BA"/>
+  <text x="670" y="112" font-size="14" font-weight="700" fill="#1D1D1F">project-b/</text>
+  <text x="670" y="134" font-size="12" fill="#6B6B70">main.py · requirements.txt</text>
+  <rect x="666" y="150" width="248" height="134" rx="6" fill="#F4F4F2" stroke="#B5B4BA" stroke-width="1.5"/>
+  <text x="682" y="174" font-size="13" font-weight="700" fill="#6B6B70">.venv/</text>
+  <rect x="682" y="186" width="216" height="36" rx="4" fill="#FFFFFF" stroke="#D9D8DE"/>
+  <text x="696" y="209" font-size="12" font-weight="600" fill="#1D1D1F">bin/python</text>
+  <text x="884" y="209" font-size="12" text-anchor="end" fill="#6B6B70">실행 파일</text>
+  <rect x="682" y="232" width="216" height="36" rx="4" fill="#FFFFFF" stroke="#D9D8DE"/>
+  <text x="696" y="255" font-size="12" font-weight="600" fill="#1D1D1F">site-packages/</text>
+  <text x="884" y="255" font-size="12" font-weight="700" text-anchor="end" fill="#9A5A0A">라이브러리 2.x</text>
+
+  <path d="M264,186 C300,186 320,204 358,204" stroke="#5B3FB8" stroke-width="1.8" fill="none" marker-end="url(#p)"/>
+  <text x="30" y="324" font-size="12" fill="#6B6B70">가상환경은 기반 Python 설치를 그대로 쓰고 패키지 설치 공간만 분리한다. 운영체제까지 격리하는 컨테이너와는 범위가 다르다.</text>
+</svg>

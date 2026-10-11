@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" role="img">
+  <title>pip install이 하는 일</title>
+  <defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#6B6B70"/></marker><marker id="t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="#135E73"/></marker></defs>
+  <rect width="960" height="300" rx="12" fill="#FAFAF8" stroke="#D9D8DE"/>
+  <text x="30" y="40" font-size="15" font-weight="700" fill="#1D1D1F">pip install 이 하는 일</text>
+  <text x="30" y="60" font-size="12" fill="#6B6B70">패키지를 내려받아, pip 을 실행한 그 Python 의 site-packages 에 넣는다</text>
+  <rect x="30" y="92" width="240" height="64" rx="6" fill="#F0ECFB" stroke="#5B3FB8" stroke-width="1.5"/><text x="150" y="119" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">python -m pip install requests</text><text x="150" y="139" font-size="11" text-anchor="middle" fill="#6B6B70">어느 Python 으로 실행했는지가 설치 위치</text>
+  <rect x="300" y="92" width="190" height="64" rx="6" fill="#FFFFFF" stroke="#B5B4BA" stroke-width="1.5"/><text x="395" y="119" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">① PyPI 에서 찾기</text><text x="395" y="139" font-size="11" text-anchor="middle" fill="#6B6B70">공개 패키지 저장소</text>
+  <rect x="520" y="92" width="200" height="64" rx="6" fill="#FBF3E6" stroke="#9A5A0A" stroke-width="1.5"/><text x="620" y="119" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">② 의존 패키지까지 받기</text><text x="620" y="139" font-size="11" text-anchor="middle" fill="#6B6B70">urllib3, idna, certifi …</text>
+  <rect x="750" y="92" width="180" height="64" rx="6" fill="#E3EEF1" stroke="#135E73" stroke-width="1.5"/><text x="840" y="119" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">③ site-packages 에 설치</text><text x="840" y="139" font-size="11" text-anchor="middle" fill="#6B6B70">.venv 안에만 들어간다</text>
+  <rect x="750" y="206" width="180" height="56" rx="6" fill="#FFFFFF" stroke="#135E73" stroke-width="1.5"/><text x="840" y="233" font-size="13" font-weight="600" text-anchor="middle" fill="#1D1D1F">import requests</text><text x="840" y="253" font-size="11" text-anchor="middle" fill="#6B6B70">main.py 가 여기서 찾아 불러온다</text>
+  <g stroke="#6B6B70" stroke-width="1.6" fill="none">
+    <path d="M270,124 H296" marker-end="url(#m)"/><path d="M490,124 H516" marker-end="url(#m)"/><path d="M720,124 H746" marker-end="url(#m)"/>
+  </g>
+  <path d="M840,206 V160" stroke="#135E73" stroke-width="1.6" fill="none" marker-end="url(#t)"/>
+  <rect x="30" y="192" width="690" height="80" rx="8" fill="#FFFFFF" stroke="#B5B4BA" stroke-dasharray="4 3"/>
+  <text x="48" y="218" font-size="12" font-weight="700" fill="#1D1D1F">Java 와 비교하면</text>
+  <text x="48" y="240" font-size="12" fill="#1D1D1F">PyPI ≈ Maven Central, requirements.txt ≈ pom.xml 의 dependencies 목록</text>
+  <text x="48" y="260" font-size="12" fill="#6B6B70">pip 은 설치만 맡는다. 컴파일·테스트·패키징 같은 빌드 단계는 관리하지 않는다.</text>
+</svg>
