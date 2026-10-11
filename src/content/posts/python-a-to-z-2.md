@@ -165,6 +165,30 @@ Java의 `record Order(int orderId, int amount)`도 데이터 전달 객체의 �
 
 DTO를 옮길 때는 “필드 선언이 짧다”보다 변경 가능성과 검증 규칙을 맞춰야 합니다. [Java record 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.10)
 
+다음은 `RecordExample.java`로 저장하는 Java 예제입니다. 음수 검증은 record가 자동으로 해 주지 않으므로 생성자에 직접 넣습니다.
+
+```java
+public class RecordExample {
+    record Order(int orderId, int amount) {
+        Order {
+            if (amount < 0) {
+                throw new IllegalArgumentException("주문 금액은 음수일 수 없습니다");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        var first = new Order(1042, 39000);
+        var second = new Order(1042, 39000);
+        System.out.println(first.amount());      // 39000
+        System.out.println(first.equals(second)); // true
+        // first.amount = 0; // final 필드이므로 대입할 수 없다
+    }
+}
+```
+
+앞의 Python dataclass도 `__post_init__`에 음수 검증을 넣었습니다. 반복 코드를 생성하는 기능과 업무 규칙을 검증하는 코드를 분리해서 보면 두 예제의 대응이 분명해집니다.
+
 ### 상속보다 필요한 동작을 먼저 정한다
 
 Python에서는 특정 부모 클래스를 상속했는지보다 "필요한 동작을 제공하는가"에 초점을 맞출 수 있습니다. 이를 흔히 덕 타이핑이라고 부릅니다.
@@ -196,6 +220,36 @@ notify_paid(1042, ConsoleSender())
 `Protocol`도 기본적으로 런타임 입력 검증기가 아닙니다. 상속 계층을 만들기 전에 호출자가 정말 필요한 작은 동작부터 정의하는 것이 핵심입니다.
 
 Java의 `interface`는 일반적으로 클래스가 `implements`로 구현 관계를 선언합니다. Python의 `Protocol`은 그 선언 없이 필요한 메서드의 형태가 맞는지를 정적으로 확인하는 **구조적 타이핑**입니다. 메서드 이름만 같다고 Java 인터페이스 구현체가 되는 것은 아니라는 차이를 기억하면 됩니다. [Java 인터페이스 명세](https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html)
+
+발송기를 인자로 받으면 외부 메일 서버 없이 호출 결과를 확인할 수 있습니다. 아래는 앞의 개념을 하나의 독립 실행 예제로 묶은 것입니다.
+
+```python
+from typing import Protocol
+
+
+class Sender(Protocol):
+    def send(self, message: str) -> None: ...
+
+
+class RecordingSender:
+    def __init__(self) -> None:
+        self.messages: list[str] = []
+
+    def send(self, message: str) -> None:
+        self.messages.append(message)
+
+
+def notify_paid(order_id: int, sender: Sender) -> None:
+    sender.send(f"주문 {order_id} 결제 완료")
+
+
+sender = RecordingSender()
+notify_paid(1042, sender)
+assert sender.messages == ["주문 1042 결제 완료"]
+print(sender.messages)  # ['주문 1042 결제 완료']
+```
+
+발송기의 내부 구현 대신 “무슨 메시지를 보냈는가”를 확인합니다. `assert`는 여기서 예제 결과를 확인하는 용도이며, 최적화 옵션으로 제거될 수 있으므로 운영 입력 검증에 쓰지 않습니다.
 
 ## 4. 이터레이터와 제너레이터: 창고 대신 컨베이어 벨트
 
@@ -236,6 +290,41 @@ Java Stream의 `filter`·`map`처럼 Python 제너레이터도 필요한 시점�
 Stream과 제너레이터 모두 소비 후 재사용을 기대하면 안 됩니다. 다만 끝난 Python 제너레이터를 다시 순회하면 보통 빈 결과가 나오고, Java Stream은 재사용을 감지하면 `IllegalStateException`을 던질 수 있습니다.
 
 제너레이터 자체에 `parallelStream()` 같은 병렬 실행 기능이 붙는 것도 아닙니다. [Java Stream 계약](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html)
+
+Java Stream으로 같은 집계를 작성하면 다음과 같습니다. `StreamExample.java`로 저장합니다.
+
+```java
+import java.util.List;
+
+public class StreamExample {
+    record Order(String status, int amount) {}
+
+    public static void main(String[] args) {
+        var orders = List.of(
+            new Order("paid", 39000),
+            new Order("cancelled", 12000)
+        );
+        int total = orders.stream()
+            .filter(order -> order.status().equals("paid"))
+            .mapToInt(Order::amount)
+            .sum(); // 최종 연산이 실행되며 값을 소비한다
+        System.out.println(total); // 39000
+    }
+}
+```
+
+Python에서도 이름 붙인 제너레이터 함수 없이 식으로 표현할 수 있습니다.
+
+```python
+orders = [
+    {"status": "paid", "amount": 39000},
+    {"status": "cancelled", "amount": 12000},
+]
+amounts = (order["amount"] for order in orders if order["status"] == "paid")
+print(sum(amounts))  # 39000
+```
+
+소괄호 안의 제너레이터 표현식은 값을 요청할 때 계산합니다. 대괄호로 바꾸면 결과 목록을 먼저 만드는 리스트 컴프리헨션이 됩니다.
 
 ## 5. 함수도 객체다: 데코레이터는 포장지
 
@@ -334,6 +423,33 @@ JSON 파싱에 실패해도 파일의 컨텍스트 관리자는 닫기를 수행
 파일뿐 아니라 락, 트랜잭션 등도 해당 객체가 제공하는 컨텍스트 관리 규약으로 수명을 명확히 할 수 있습니다.
 
 다만 모든 `with`가 커밋을 뜻하는 것은 아닙니다. 종료 동작은 객체마다 다릅니다.
+
+컨텍스트 관리자의 종료 동작은 오류 경로에서도 실행됩니다. 다음은 외부 자원 대신 출력으로 실행 순서를 보여 주는 예제입니다.
+
+```python
+from contextlib import contextmanager
+
+
+@contextmanager
+def processing_scope(order_id: int):
+    print(f"시작: {order_id}")
+    try:
+        yield
+    finally:
+        print(f"정리: {order_id}")
+
+
+try:
+    with processing_scope(1042):
+        raise ValueError("잘못된 주문")
+except ValueError as exc:
+    print(f"실패: {exc}")
+# 시작: 1042
+# 정리: 1042
+# 실패: 잘못된 주문
+```
+
+`yield` 앞은 진입, 뒤의 `finally`는 정리 단계입니다. 이 관리자는 예외를 삼키지 않아 바깥의 `except`까지 실패가 전달됩니다. DB 트랜잭션을 구현한 예제는 아니며, 실제 자원에는 해당 라이브러리의 관리자를 사용합니다. [contextlib 공식 문서](https://docs.python.org/3.13/library/contextlib.html#contextlib.contextmanager)
 
 ### Java에서는: try-with-resources와 연결하되 예외 계약은 다르다
 

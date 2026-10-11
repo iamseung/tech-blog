@@ -58,6 +58,33 @@ Java의 스레드 풀 크기 조정 경험을 Python CPU 작업에 그대로 적
 
 반대로 C 확장 내부에서 GIL을 해제하는 작업이라면 Python 스레드도 병렬 계산에 도움이 될 수 있습니다. 실행하는 코드가 어디에 있는지까지 봐야 합니다. [Java 플랫폼 스레드](https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html)
 
+앞의 차이를 Java 코드로 확인할 출발점입니다. `CpuPoolExample.java`로 저장합니다. 뒤의 Python 프로세스 풀 예제와 같은 계산을 JVM에서는 스레드 풀에 제출합니다.
+
+```java
+import java.util.concurrent.Executors;
+
+public class CpuPoolExample {
+    static long sumSquares(int limit) {
+        long total = 0;
+        for (long number = 0; number < limit; number++) {
+            total += number * number;
+        }
+        return total;
+    }
+
+    public static void main(String[] args) throws Exception {
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var first = pool.submit(() -> sumSquares(10));
+            var second = pool.submit(() -> sumSquares(20));
+            System.out.println(first.get());  // 285
+            System.out.println(second.get()); // 2470
+        }
+    }
+}
+```
+
+둘 다 제출한 뒤 결과를 기다리는 순서가 중요합니다. 작업 하나를 제출할 때마다 곧바로 `get()`으로 기다리면 작업 간 겹칠 기회를 줄입니다. 이 작은 입력은 실행 구조를 보여 주기 위한 것이며 성능 비교 결과가 아닙니다. [Executors 공식 문서](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Executors.html)
+
 ## 2. 스레드와 프로세스: 같은 집과 별도 작업장
 
 스레드는 메모리를 함께 쓰기 쉬운 대신 상태 충돌을 조심해야 합니다. 프로세스는 실행 공간을 나누는 대신 데이터를 주고받는 비용을 부담합니다.
@@ -165,6 +192,34 @@ if __name__ == "__main__":
 
 기존 동기 I/O 함수를 연결할 때는 `asyncio.to_thread()`를 검토할 수 있지만, 취소해도 이미 실행 중인 스레드 작업이 강제로 중단되지는 않습니다. [asyncio 작업과 취소 공식 문서](https://docs.python.org/3.13/library/asyncio-task.html)
 
+타임아웃에서 어떤 일이 일어나는지도 확인할 수 있습니다. 취소가 전달되어 `finally`가 실행된 뒤, 바깥에서 `TimeoutError`를 받습니다.
+
+```python
+import asyncio
+
+
+async def slow_delivery() -> None:
+    try:
+        await asyncio.sleep(1)
+    finally:
+        print("배송 조회 자원 정리")
+
+
+async def main() -> None:
+    try:
+        async with asyncio.timeout(0.01):
+            await slow_delivery()
+    except TimeoutError:
+        print("배송 조회 시간 초과")
+
+
+asyncio.run(main())
+# 배송 조회 자원 정리
+# 배송 조회 시간 초과
+```
+
+취소를 삼키지 않고 정리만 하는 것이 포인트입니다. 이미 외부 시스템에 반영된 주문을 타임아웃이 자동으로 되돌려 주지는 않습니다.
+
 ### JVM에서는: 가상 스레드와 asyncio는 같은 구현이 아니다
 
 Java 21의 가상 스레드는 동기 호출 형태를 유지하면서 많은 대기 작업을 처리하도록 돕습니다. 지원되는 블로킹 I/O에서 가상 스레드가 대기하면, 이를 실행하던 플랫폼 스레드를 다른 가상 스레드에 사용할 수 있습니다.
@@ -189,6 +244,46 @@ Python asyncio는 `async`/`await`와 비동기 라이브러리로 양보 지점�
 지속적으로 들어오는 작업은 크기가 제한된 `asyncio.Queue`와 고정된 워커 수를 고려합니다. 큐가 가득 차면 생산자도 기다리게 하여 입력 속도를 조절하는 것이 **백프레셔**입니다.
 
 프로세스가 죽어도 남아야 하는 작업은 메모리 큐만으로 보관할 수 없습니다. 앞서 정리한 [RabbitMQ와 Kafka 글](/posts/rabbitmq-and-kafka/)의 전달 보증과도 연결되는 지점입니다.
+
+아래는 주문 수만큼 태스크를 만들지 않고 **워커 두 개와 크기 2의 큐**로 처리하는 예제입니다. `None`은 정상 종료를 알리는 표식으로 사용합니다.
+
+```python
+import asyncio
+
+
+async def worker(queue: asyncio.Queue, completed: list[int]) -> None:
+    while True:
+        order_id = await queue.get()
+        try:
+            if order_id is None:
+                return
+            await asyncio.sleep(0.01)  # 비동기 I/O 모사
+            completed.append(order_id)
+        finally:
+            queue.task_done()
+
+
+async def main() -> None:
+    queue = asyncio.Queue(maxsize=2)
+    completed: list[int] = []
+    async with asyncio.TaskGroup() as group:
+        for _ in range(2):
+            group.create_task(worker(queue, completed))
+        for order_id in range(1042, 1047):
+            await queue.put(order_id)  # 큐가 가득 차면 생산자도 기다린다
+        for _ in range(2):
+            await queue.put(None)
+        await queue.join()
+    assert sorted(completed) == list(range(1042, 1047))
+    print(sorted(completed))  # [1042, 1043, 1044, 1045, 1046]
+
+
+asyncio.run(main())
+```
+
+실행 중인 두 작업과 큐에서 기다리는 두 작업은 별개입니다. 출력은 완료 순서를 보장하려는 것이 아니라 처리 누락을 확인하려고 정렬했습니다.
+
+`task_done()`은 큐의 미완료 카운터를 줄이는 호출이지 업무 성공이나 브로커 ack가 아닙니다. 워커가 실패하면 이 예제의 `TaskGroup`은 나머지를 취소하고 실패를 올립니다. 실패한 주문을 영속화하거나 재시도하는 경로는 실제 시스템에서 따로 설계해야 합니다. [asyncio.Queue 공식 문서](https://docs.python.org/3.13/library/asyncio-queue.html)
 
 ## 4. 테스트: 실행되었다보다 무엇이 맞는가
 
@@ -231,6 +326,34 @@ python -m unittest discover -s tests -v
 계산 규칙은 단위 테스트로, 실제 DB와 메시지 브로커의 계약은 통합 테스트로 확인합니다. 가짜 발송기를 사용한 테스트가 통과했다고 실제 메일 서버의 인증이나 타임아웃까지 검증된 것은 아닙니다.
 
 표준 라이브러리만으로 시작할 수 있는 테스트 도구가 [unittest](https://docs.python.org/3.13/library/unittest.html)입니다.
+
+외부 호출이 실패하는 경로도 정상 반환만큼 중요합니다. 다음 코드를 `tests/test_notification.py`로 저장하면 앞의 unittest 명령으로 함께 실행할 수 있습니다. 네트워크를 사용하지 않는 독립 예제입니다.
+
+```python
+import unittest
+
+
+def notify_paid(order_id, sender):
+    # 실패를 숨기지 않고 호출자에게 전달한다.
+    sender.send(f"주문 {order_id} 결제 완료")
+
+
+class FailingSender:
+    def send(self, message):
+        raise TimeoutError("메일 서버 응답 지연")
+
+
+class NotificationTest(unittest.TestCase):
+    def test_send_failure_reaches_caller(self):
+        with self.assertRaisesRegex(TimeoutError, "메일 서버 응답 지연"):
+            notify_paid(1042, FailingSender())
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+이 테스트는 재시도 횟수를 검증하지 않습니다. 상위 작업 처리기가 재시도 여부를 결정할 수 있도록 실패가 전달된다는 계약을 검증합니다.
 
 ## 5. 로깅: 작업의 흔적을 남긴다
 

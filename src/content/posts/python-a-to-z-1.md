@@ -118,6 +118,26 @@ print(amount, backup)  # 1500 1000
 
 함수 인자로 넘길 때도 같은 원리가 적용됩니다. 인자 이름이 전달받은 객체를 가리키므로, 리스트를 수정하면 호출자에게 보이고 이름을 재대입하면 그 이름의 연결만 바뀝니다.
 
+호출자가 가진 목록을 바꾸는 경우와 함수 안의 이름만 바꾸는 경우도 직접 비교할 수 있습니다.
+
+```python
+def append_order(ids: list[int]) -> None:
+    ids.append(1043)
+
+
+def replace_orders(ids: list[int]) -> None:
+    ids = [9999]  # 이 함수의 지역 이름만 새 목록으로 연결한다
+    print(ids)
+
+
+order_ids = [1042]
+append_order(order_ids)
+replace_orders(order_ids)  # [9999]
+print(order_ids)           # [1042, 1043]
+```
+
+호출자에게 새 목록을 전달하려면 함수가 그 목록을 `return`하고 호출자가 반환값을 대입하도록 계약을 만듭니다.
+
 ### Java에서는: 참조 공유는 같고, 기본형의 취급은 다르다
 
 Java에서도 리스트 대입은 객체 복사가 아닙니다. 아래 코드를 `ReferenceExample.java`로 저장하면 앞의 Python 예제와 같은 공유를 확인할 수 있습니다.
@@ -163,6 +183,36 @@ Java의 기본형 `==`는 값 비교입니다. `equals`도 클래스가 어떻�
 
 Python의 `==` 역시 `__eq__`로 정의할 수 있으므로, 두 언어 모두 사용자 정의 객체의 동등성 계약을 확인해야 합니다. [Java 동등성 연산자](https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.21)
 
+같은 내용의 리스트 두 개로 비교하면 차이가 바로 보입니다.
+
+```python
+first = [1042, 1043]
+second = [1042, 1043]
+alias = first
+
+print(first == second)  # True: 항목의 값이 같다
+print(first is second)  # False: 서로 다른 리스트다
+print(first is alias)   # True: 같은 리스트를 가리킨다
+```
+
+Java에서는 같은 질문에 쓰는 연산자가 다릅니다. `EqualityExample.java`로 저장해서 실행합니다.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class EqualityExample {
+    public static void main(String[] args) {
+        var first = new ArrayList<>(List.of(1042, 1043));
+        var second = new ArrayList<>(List.of(1042, 1043));
+        var alias = first;
+        System.out.println(first.equals(second)); // true: 항목의 값 비교
+        System.out.println(first == second);      // false: 참조 비교
+        System.out.println(first == alias);       // true
+    }
+}
+```
+
 ### 얕은 복사는 한 층만 복사한다
 
 ```python
@@ -195,6 +245,27 @@ print(order is copy)   # False
 빈 집합은 `set()`입니다. `{}`는 빈 딕셔너리입니다.
 
 리스트를 큐로 쓰면서 앞에서 계속 꺼내야 한다면 `collections.deque`의 `popleft()`가 더 어울립니다. 각 컨테이너의 기본 연산은 [공식 자료구조 설명](https://docs.python.org/3.13/tutorial/datastructures.html)에 정리되어 있습니다.
+
+주문 처리에서는 같은 입력을 서로 다른 목적으로 가공합니다. ID로 조회할 때는 딕셔너리, 중복을 없앨 때는 집합, 먼저 온 작업부터 꺼낼 때는 큐가 어울립니다.
+
+```python
+from collections import deque
+
+orders = [{"id": 1042, "amount": 39000}, {"id": 1043, "amount": 12000}]
+by_id = {order["id"]: order for order in orders}
+print(by_id[1043]["amount"])  # 12000
+
+received_ids = [1042, 1042, 1043]
+unique_ids = set(received_ids)
+print(sorted(unique_ids))    # [1042, 1043]: 출력 순서는 명시적으로 정한다
+
+pending = deque([1042, 1043])
+pending.append(1044)
+print(pending.popleft())     # 1042
+print(list(pending))         # [1043, 1044]
+```
+
+`by_id`는 원래 주문 객체를 복사하지 않습니다. 또한 같은 ID가 여러 번 나오면 뒤의 값이 앞의 값을 덮습니다. 이 입력에서 중복 ID를 오류로 볼지, 최신 값으로 볼지는 별도로 정해야 합니다.
 
 ### Java에서는: 같은 이름의 숫자 타입도 범위가 다르다
 
@@ -264,6 +335,22 @@ print(paid_ids)  # [1042]
 `None`, 숫자 0, 빈 문자열과 빈 컨테이너는 조건식에서 거짓으로 취급됩니다. 그래서 `if not amount`는 금액이 없는 경우와 0원인 경우를 구분하지 못합니다. 무료 주문이 가능하다면 `amount is None`으로 검사해야 합니다.
 
 `value or default`도 같은 함정이 있습니다. 0이나 빈 문자열을 정상 입력으로 인정하는지 먼저 결정합니다. 제어문과 함수 문법은 [공식 제어 흐름 문서](https://docs.python.org/3.13/tutorial/controlflow.html)를 기준으로 합니다.
+
+배송비 0원을 정상 입력으로 받는 상황을 코드로 확인해 보겠습니다.
+
+```python
+def shipping_fee(value: int | None) -> int:
+    return 3000 if value is None else value
+
+
+for value in (None, 0, 2500):
+    print(value, value or 3000, shipping_fee(value))
+# None 3000 3000
+# 0 3000 0       ← or를 쓰면 무료 배송이 3000원으로 바뀐다
+# 2500 2500 2500
+```
+
+이 함수는 이미 검증한 내부 입력을 받는 예제입니다. 금액 범위와 외부 입력 타입 검증은 별도 경계에서 처리합니다.
 
 ## 5. 함수: 입력과 결과의 경계를 만든다
 

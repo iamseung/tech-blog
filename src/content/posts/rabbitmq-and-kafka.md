@@ -192,6 +192,49 @@ confirm을 기다리다 타임아웃이 나면 메시지가 실제로 들어갔�
 
 중복은 소비자가 멱등하게 흡수해야 합니다. 예를 들어 주문 확인 메일을 보내는 소비자라면 "주문 1042번 메일 발송 완료"를 DB에 기록해 두고, 같은 주문의 메시지가 다시 오면 보내지 않고 ack만 합니다.
 
+#### 브로커 없이 실습하기: 중복 이벤트가 와도 한 번만 적립하기
+
+“멱등하게 처리한다”를 구체화해 보겠습니다. 아래는 Python 표준 라이브러리의 SQLite만 사용하는 독립 실행 예제입니다. 실제 RabbitMQ 연결은 없으며, 같은 이벤트가 재배달된 상황을 함수 두 번 호출로 모사합니다.
+
+```python
+import sqlite3
+from contextlib import closing
+
+
+def apply_credit(db, event_id: str, amount: int) -> bool:
+    with db:  # 이벤트 기록과 잔액 변경을 함께 커밋·롤백한다
+        inserted = db.execute(
+            "INSERT INTO processed(event_id) VALUES (?) "
+            "ON CONFLICT(event_id) DO NOTHING",
+            (event_id,),
+        )
+        if inserted.rowcount == 0:
+            return False
+        db.execute("UPDATE account SET balance = balance + ? WHERE id = 1", (amount,))
+    return True
+
+
+with closing(sqlite3.connect(":memory:")) as db:
+    db.executescript('''
+        CREATE TABLE processed(event_id TEXT PRIMARY KEY);
+        CREATE TABLE account(id INTEGER PRIMARY KEY, balance INTEGER NOT NULL);
+        INSERT INTO account VALUES (1, 0);
+    ''')
+    print(apply_credit(db, "payment-1042", 39000))  # True
+    print(apply_credit(db, "payment-1042", 39000))  # False
+    balance = db.execute("SELECT balance FROM account WHERE id = 1").fetchone()[0]
+    assert balance == 39000
+    print(balance)  # 39000: 두 번 더해지지 않았다
+```
+
+예제의 스키마에는 계좌 1이 반드시 존재합니다. 실제 서비스에서는 계좌 존재와 입력 금액도 검증하고, 같은 이벤트 ID는 같은 내용을 뜻한다는 계약을 정해야 합니다.
+
+핵심은 **중복 방지 기록과 업무 변경을 같은 DB 트랜잭션 안에 묶는 것**입니다. 이 함수의 커밋이 끝난 뒤 ack하거나 offset을 커밋합니다. 그 직전에 프로세스가 죽어 재배달되어도 고유 키가 중복 반영을 막습니다.
+
+메모리 DB는 종료하면 사라지므로 재시작 복구를 보여 주는 코드는 아닙니다. 운영에서는 영속 DB와 여러 소비자 사이의 동시성 제어가 필요합니다.
+
+또한 이메일·결제 API 같은 외부 호출은 이 DB 트랜잭션에 포함되지 않습니다. 그런 부수 효과에는 외부 서비스의 멱등 키나 outbox 같은 추가 설계가 필요합니다. [sqlite3 트랜잭션과 컨텍스트 관리자](https://docs.python.org/3.13/library/sqlite3.html#how-to-use-the-connection-context-manager)
+
 ### 재시도 사다리: 코드에 sleep 없이 기다리기
 
 RabbitMQ의 장점은 실패 경로를 브로커가 들고 있다는 점입니다. 핵심 기능은 dead-letter입니다.
@@ -494,6 +537,36 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group settlement \
 ```
 
 추천 그룹과 대시보드 그룹의 위치는 그대로입니다. 읽는 위치를 그룹마다 따로 기록하기 때문입니다.
+
+#### 브로커 없이 실습하기: 커밋할 위치 계산하기
+
+Kafka에서 커밋하는 값은 마지막으로 처리한 레코드의 offset 자체가 아니라 **다음에 읽을 위치**입니다. 다음 코드는 실제 Kafka 클라이언트가 아니라, 한 파티션에서 순서대로 처리할 때 실패 앞에서 멈추는 원리를 보여 주는 Python 모델입니다.
+
+```python
+def process_batch(records, committed):
+    applied = []
+    for offset, order_id, succeeds in records:
+        if offset < committed:
+            continue
+        if not succeeds:
+            break  # 실패한 레코드를 건너뛰어 커밋하지 않는다
+        applied.append(order_id)
+        committed = offset + 1
+    return applied, committed
+
+
+records = [(10, 1042, True), (11, 1043, False), (12, 1044, True)]
+applied, next_offset = process_batch(records, committed=10)
+print(applied, next_offset)  # [1042] 11
+
+# 실패 원인을 해결한 뒤 11부터 다시 읽는다.
+retry = [(11, 1043, True), (12, 1044, True)]
+print(process_batch(retry, committed=next_offset))  # ([1043, 1044], 13)
+```
+
+offset 12의 성공만 보고 13을 커밋하면, 재시작한 소비자는 실패했던 11을 건너뛸 수 있습니다. 병렬 처리에서는 완료된 작업 중 가장 큰 offset이 아니라, 앞에서부터 처리가 끝난 범위를 추적해야 하는 이유입니다.
+
+실제 소비자는 토픽·파티션별 위치를 따로 관리합니다. 이 예제는 DB 처리와 Kafka 커밋을 원자적으로 묶지 않으며, 로그 압축이나 트랜잭션 때문에 실제 읽은 offset에는 간격이 있을 수도 있습니다. [KafkaConsumer의 위치와 수동 커밋](https://kafka.apache.org/40/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html)
 
 ### 실패 처리는 애플리케이션 몫이다
 
